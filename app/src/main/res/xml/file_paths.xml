@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Внешний кэш -->
+    <external-cache-path name="external_cache" path="." />
+    <!-- Внутренний кэш -->
+    <cache-path name="internal_cache" path="." />
+    <!-- Внешнее хранилище -->
+    <external-path name="external_storage" path="." />
+    <!-- Внешние файлы приложения -->
+    <external-files-path name="external_files" path="." />
+    <!-- Файлы приложения -->
+    <files-path name="files" path="." />
+</paths>
