@@ -6,15 +6,25 @@ import com.example.fooddiary.data.auth.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
-class AuthViewModel : ViewModel() {
-    private val authRepository = AuthRepository()
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
+//class AuthViewModel : ViewModel() {
+//    private val authRepository = AuthRepository()
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+
+    val isUserLoggedIn: Boolean
+        get() = authRepository.isLoggedIn
 
     fun signIn(email: String, password: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
@@ -50,7 +60,11 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun isUserLoggedIn(): Boolean {
-        return authRepository.isLoggedIn
+//    fun isUserLoggedIn(): Boolean {
+//        return authRepository.isLoggedIn
+//    }
+
+    fun signOut() {
+        authRepository.signOut()
     }
 }

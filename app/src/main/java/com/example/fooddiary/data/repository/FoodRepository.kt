@@ -1,10 +1,14 @@
 package com.example.fooddiary.data.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
 data class FoodEntry(
     val id: String = "",
@@ -15,7 +19,7 @@ data class FoodEntry(
     val carbs: Double = 0.0,
     val date: Date = Date(),
     val userId: String = "",
-    val mealType: String = "Завтрак" // Завтрак, Обед, Ужин, Перекус
+    val mealType: String = "Завтрак"
 )
 
 data class DailyStats(
@@ -27,26 +31,37 @@ data class DailyStats(
     val userId: String = ""
 )
 
-class FoodRepository {
+@Singleton
+class FoodRepository @Inject constructor() {
     private val db: FirebaseFirestore = Firebase.firestore
+//class FoodRepository {
+//    private val db: FirebaseFirestore = Firebase.firestore
+
+    companion object {
+        const val COLLECTION_FOOD_ENTRIES = "foodEntries"
+    }
 
     suspend fun addFoodEntry(food: FoodEntry, userId: String): String {
-        val foodWithId = db.collection("foodEntries").document()
-        val foodData = food.copy(id = foodWithId.id, userId = userId)
+        val foodWithId = db.collection(COLLECTION_FOOD_ENTRIES).document()
+        val foodData = food.copy(
+            id = foodWithId.id,
+            userId = userId,
+            date = Date()
+        )
 
         foodWithId.set(foodData).await()
         return foodWithId.id
     }
 
     suspend fun getFoodEntries(userId: String): List<FoodEntry> {
-        val snapshot = db.collection("foodEntries")
+        val snapshot = db.collection(COLLECTION_FOOD_ENTRIES)
             .whereEqualTo("userId", userId)
-            .orderBy("date", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .orderBy("date", com.google.firebase.firestore.Query.Direction.ASCENDING)
             .get()
             .await()
 
-        return snapshot.documents.map { doc ->
-            doc.toObject(FoodEntry::class.java) ?: FoodEntry()
+        return snapshot.documents.mapNotNull { doc ->
+            doc.toObject(FoodEntry::class.java)
         }
     }
 
@@ -63,20 +78,29 @@ class FoodRepository {
         calendar.add(Calendar.DAY_OF_MONTH, 1)
         val endOfDay = calendar.time
 
-        val snapshot = db.collection("foodEntries")
-            .whereEqualTo("userId", userId)
-            .whereGreaterThanOrEqualTo("date", startOfDay)
-            .whereLessThan("date", endOfDay)
-            .get()
-            .await()
+        try {
+            val snapshot = db.collection(COLLECTION_FOOD_ENTRIES)
+                .whereEqualTo("userId", userId)
+                .whereGreaterThanOrEqualTo("date", startOfDay)
+                .whereLessThan("date", endOfDay)
+                .get()
+                .await()
 
-        return snapshot.documents.map { doc ->
-            doc.toObject(FoodEntry::class.java) ?: FoodEntry()
+            return snapshot.documents.mapNotNull { doc ->
+                doc.toObject(FoodEntry::class.java)
+            }
+        } catch (e: Exception) {
+            // Если нет индекса, возвращаем пустой список
+            return emptyList()
         }
     }
 
+    suspend fun getTodayFoodEntries(userId: String): List<FoodEntry> {
+        return getFoodEntriesByDate(userId, Date())
+    }
+
     suspend fun deleteFoodEntry(foodId: String) {
-        db.collection("foodEntries").document(foodId).delete().await()
+        db.collection(COLLECTION_FOOD_ENTRIES).document(foodId).delete().await()
     }
 
     suspend fun getDailyStats(userId: String, date: Date): DailyStats {
@@ -108,6 +132,43 @@ class FoodRepository {
             calendar.add(Calendar.DAY_OF_MONTH, -1)
         }
 
-        return stats.reversed() // Сначала старые даты
+        return stats.reversed()
+    }
+
+    suspend fun testQueries(userId: String) {
+        try {
+            // Тест запроса 1
+            val test1 = db.collection("foodEntries")
+                .whereEqualTo("userId", userId)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .await()
+            Log.d("FirestoreTest", "Запрос 1 выполнен успешно")
+
+            // Тест запроса 2
+            val today = Date()
+            val calendar = Calendar.getInstance().apply {
+                time = today
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            val startOfDay = calendar.time
+
+            val test2 = db.collection("foodEntries")
+                .whereEqualTo("userId", userId)
+                .whereGreaterThanOrEqualTo("date", startOfDay)
+                .limit(1)
+                .get()
+                .await()
+            Log.d("FirestoreTest", "Запрос 2 выполнен успешно")
+
+        } catch (e: Exception) {
+            Log.e("FirestoreTest", "Ошибка запроса: ${e.message}")
+            if (e.message?.contains("index") == true) {
+                Log.e("FirestoreTest", "⚠️ Нужно создать индекс в Firebase Console!")
+            }
+        }
     }
 }
+

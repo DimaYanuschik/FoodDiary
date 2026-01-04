@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddiary.ui.viewmodels.AuthViewModel
 
@@ -15,7 +16,8 @@ fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
-    val viewModel: AuthViewModel = viewModel()
+//    val viewModel: AuthViewModel = viewModel()
+    val viewModel: AuthViewModel = hiltViewModel()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -81,8 +83,6 @@ fun RegisterScreen(
             onClick = {
                 if (password == confirmPassword) {
                     viewModel.signUp(email, password, onRegisterSuccess)
-                } else {
-                    // Здесь можно показать ошибку
                 }
             },
             modifier = Modifier.fillMaxWidth(),

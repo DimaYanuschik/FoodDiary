@@ -10,10 +10,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.fooddiary.data.models.BarcodeProduct
+import com.example.fooddiary.data.models.ScannedFoodEntry
 import com.example.fooddiary.data.repository.FoodEntry
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import java.util.*
+import kotlin.String
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,7 +25,8 @@ fun AddFoodScreen(
     onNavigateBack: () -> Unit,
     onFoodAdded: () -> Unit
 ) {
-    val viewModel: FoodViewModel = viewModel()
+//    val viewModel: FoodViewModel = viewModel()
+    val viewModel: FoodViewModel = hiltViewModel()
 
     var foodName by remember { mutableStateOf("") }
     var calories by remember { mutableStateOf("") }
@@ -67,7 +72,7 @@ fun AddFoodScreen(
                 leadingIcon = { Icon(Icons.Filled.Restaurant, contentDescription = null) }
             )
 
-            // Тип приема пищи - ИСПРАВЛЕННЫЙ КОД
+            // Тип приема пищи
             ExposedDropdownMenuBox(
                 expanded = isExpanded,
                 onExpandedChange = { isExpanded = it }
@@ -168,7 +173,7 @@ fun AddFoodScreen(
                 )
             }
 
-            // Расчетные калории из БЖУ (опционально)
+            // Расчетные калории из БЖУ
             val calculatedCalories = remember(protein, fat, carbs) {
                 val p = protein.toDoubleOrNull() ?: 0.0
                 val f = fat.toDoubleOrNull() ?: 0.0
@@ -201,18 +206,24 @@ fun AddFoodScreen(
             // Кнопка добавления
             Button(
                 onClick = {
-                    val foodEntry = FoodEntry(
+                    val foodEntry = ScannedFoodEntry(
                         name = foodName,
                         calories = calories.toIntOrNull() ?: calculatedCalories,
                         protein = protein.toDoubleOrNull() ?: 0.0,
                         fat = fat.toDoubleOrNull() ?: 0.0,
                         carbs = carbs.toDoubleOrNull() ?: 0.0,
                         date = Date(),
-                        mealType = mealType
+                        mealType = mealType,
+                        //Костыль
+                        notes = "",
+                        barcode = null,
+                        source = "barcode_scan",
+                        originalProduct = null
                     )
 
                     viewModel.addFoodEntry(foodEntry)
                     onFoodAdded()
+                    onNavigateBack()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = foodName.isNotBlank() && !isLoading

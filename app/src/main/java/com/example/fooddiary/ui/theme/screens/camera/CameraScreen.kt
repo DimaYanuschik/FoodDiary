@@ -223,7 +223,6 @@ fun CameraPreview(
 
         } catch (e: Exception) {
             e.printStackTrace()
-            // Можно показать сообщение об ошибке
             Log.e("CameraPreview", "Ошибка инициализации камеры: ${e.message}")
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddiary.data.repository.FoodEntry
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
@@ -22,8 +23,10 @@ fun FoodListScreen(
     onAddFoodClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: FoodViewModel = viewModel()
-    val foodEntries by viewModel.foodEntries.collectAsState()
+//    val viewModel: FoodViewModel = viewModel()
+    val viewModel: FoodViewModel = hiltViewModel()
+
+    val todayFoodEntries by viewModel.todayFoodEntries.collectAsState()
     val dailyStats by viewModel.dailyStats.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
@@ -99,7 +102,7 @@ fun FoodListScreen(
             ) {
                 CircularProgressIndicator()
             }
-        } else if (foodEntries.isEmpty()) {
+        } else if (todayFoodEntries.isEmpty()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onAddFoodClick
@@ -131,22 +134,21 @@ fun FoodListScreen(
             }
         } else {
             // Список еды по приемам пищи
-            val meals = foodEntries.groupBy { it.mealType }
+            val meals = todayFoodEntries.groupBy { it.mealType }
 
-            LazyColumn(
+
+            Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 meals.forEach { (mealType, entries) ->
-                    item {
-                        Text(
-                            text = mealType,
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-                    }
+                    Text(
+                        text = mealType,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
 
-                    items(entries) { food ->
+                    entries.forEach { food ->
                         FoodItemCard(
                             food = food,
                             onDelete = { viewModel.deleteFoodEntry(food.id) }

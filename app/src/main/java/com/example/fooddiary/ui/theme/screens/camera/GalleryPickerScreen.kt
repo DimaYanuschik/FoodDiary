@@ -33,7 +33,7 @@ fun GalleryPickerScreen(
         }
     }
 
-    // Launcher для выбора нескольких изображений (можно использовать позже)
+    // Launcher для выбора нескольких изображений
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia()
     ) { uris ->

@@ -4,9 +4,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class AuthRepository {
+@Singleton
+class AuthRepository @Inject constructor() {
+//class AuthRepository {
     private val auth: FirebaseAuth = Firebase.auth
 
     val currentUser = auth.currentUser

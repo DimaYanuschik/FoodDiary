@@ -5,6 +5,8 @@ plugins {
 
     id("com.google.gms.google-services")
 
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
     // Опционально, если нужны:
     // alias(libs.plugins.firebase.crashlytics)
     // alias(libs.plugins.firebase.perf)
@@ -70,6 +72,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.compose.foundation)
 
     // CameraX (ИСПРАВЛЕННЫЕ ВЕРСИИ)
     val cameraxVersion = "1.3.2"  // Более стабильная версия
@@ -92,6 +95,26 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // ML Kit для сканирования штрихкодов
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+
+    // Room для локальной базы
+    implementation("androidx.room:room-runtime:2.6.0")
+    implementation("androidx.room:room-ktx:2.6.0")
+    kapt("androidx.room:room-compiler:2.6.0")
+
+    // Retrofit для API запросов
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // Hilt для DI
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
