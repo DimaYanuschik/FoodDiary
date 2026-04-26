@@ -38,7 +38,6 @@ class UserProfileRepository {
                 )
                 newDocRef
             }
-
             profileRef.set(profileToSave).await()
             profileToSave.id
         } catch (e: Exception) {

@@ -54,7 +54,7 @@ class BarcodeRepository @Inject constructor(
     suspend fun fetchProductInfo(barcode: String): BarcodeScanResult {
         Log.d(tag, "Поиск продукта: $barcode")
 
-        // 1. Локальная база (источник истины для кэша)
+        // 1. Локальная база
         try {
             val localProduct = dao.getByBarcode(barcode)
             if (localProduct != null) {

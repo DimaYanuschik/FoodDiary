@@ -60,7 +60,6 @@ fun MainApp() {
         currentScreen = if (isUserLoggedIn) Screens.Home else Screens.Login
     }
 
-
 //    LaunchedEffect(authViewModel.isUserLoggedIn) {
 //        currentScreen = if (authViewModel.isUserLoggedIn) Screens.Home else Screens.Login
 //    }
