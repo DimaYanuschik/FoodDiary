@@ -1,16 +1,14 @@
 package com.example.fooddiary.ui.viewmodels
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fooddiary.data.models.BarcodeProduct
-import com.example.fooddiary.data.models.BarcodeScanResult
-import com.example.fooddiary.data.repository.BarcodeRepository
+import com.example.fooddiary.data_old.models.BarcodeProduct
+import com.example.fooddiary.data_old.models.BarcodeScanResult
+import com.example.fooddiary.data_old.repository.BarcodeRepository
 import com.google.mlkit.vision.common.InputImage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject

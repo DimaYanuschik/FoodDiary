@@ -1,4 +1,4 @@
-package com.example.fooddiary.data.repository
+package com.example.fooddiary.data_old.repository
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore

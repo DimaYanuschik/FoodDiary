@@ -12,8 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -23,14 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.fooddiary.data.auth.AuthRepository
-import com.example.fooddiary.data.models.BarcodeScanResult
+import com.example.fooddiary.data_old.auth.AuthRepository
+import com.example.fooddiary.data_old.models.BarcodeScanResult
 import com.example.fooddiary.ui.screens.camera.CameraScreen
 import com.example.fooddiary.ui.screens.camera.GalleryPickerScreen
 import com.example.fooddiary.ui.screens.food.AddFoodScreen
 import com.example.fooddiary.ui.screens.barcode.BarcodeProductScreen
 import com.example.fooddiary.ui.screens.barcode.BarcodeScannerScreen
-import com.example.fooddiary.ui.screens.food.FoodListScreen
 import com.example.fooddiary.ui.screens.profile.CalorieGoalScreen
 import com.example.fooddiary.ui.screens.profile.UserProfileScreen
 import com.example.fooddiary.ui.screens.stats.EnhancedStatsScreen
@@ -475,7 +472,7 @@ fun FoodListScreenWithScroll(
 
 @Composable
 fun FoodItemCard(
-    food: com.example.fooddiary.data.repository.FoodEntry,
+    food: com.example.fooddiary.data_old.repository.FoodEntry,
     onDelete: () -> Unit
 ) {
     Card(
@@ -526,8 +523,8 @@ fun FoodItemCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CalorieProgressCard(
-    dailyStats: com.example.fooddiary.data.repository.DailyStats,
-    calorieGoal: com.example.fooddiary.data.models.CalorieGoal?,
+    dailyStats: com.example.fooddiary.data_old.repository.DailyStats,
+    calorieGoal: com.example.fooddiary.data_old.models.CalorieGoal?,
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

@@ -1,6 +1,6 @@
-package com.example.fooddiary.data.api
+package com.example.fooddiary.data_old.api
 
-import com.example.fooddiary.data.models.OpenFoodFactsResponse
+import com.example.fooddiary.data_old.models.OpenFoodFactsResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

@@ -10,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -19,9 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.fooddiary.data.models.BarcodeProduct
-import com.example.fooddiary.data.models.BarcodeScanResult
-import com.example.fooddiary.data.models.ScannedFoodEntry
+import com.example.fooddiary.data_old.models.BarcodeScanResult
+import com.example.fooddiary.data_old.models.ScannedFoodEntry
 import com.example.fooddiary.ui.viewmodels.BarcodeViewModel
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import java.util.*

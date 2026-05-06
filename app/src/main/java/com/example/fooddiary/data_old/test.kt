@@ -1,4 +1,4 @@
-package com.example.fooddiary.data
+package com.example.fooddiary.data_old
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview

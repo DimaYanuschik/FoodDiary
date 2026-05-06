@@ -1,11 +1,11 @@
-package com.example.fooddiary.data.repository
+package com.example.fooddiary.data_old.repository
 
 import android.content.Context
 import android.util.Log
-import com.example.fooddiary.data.api.ApiClient
-import com.example.fooddiary.data.database.BarcodeDatabase
-import com.example.fooddiary.data.models.BarcodeProduct
-import com.example.fooddiary.data.models.BarcodeScanResult
+import com.example.fooddiary.data_old.api.ApiClient
+import com.example.fooddiary.data_old.database.BarcodeDatabase
+import com.example.fooddiary.data_old.models.BarcodeProduct
+import com.example.fooddiary.data_old.models.BarcodeScanResult
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -13,7 +13,6 @@ import com.google.mlkit.vision.common.InputImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 

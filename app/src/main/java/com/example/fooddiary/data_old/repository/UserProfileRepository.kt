@@ -1,9 +1,9 @@
-package com.example.fooddiary.data.repository
+package com.example.fooddiary.data_old.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.example.fooddiary.data.models.UserProfile
+import com.example.fooddiary.data_old.models.UserProfile
 import kotlinx.coroutines.tasks.await
 import java.util.*
 

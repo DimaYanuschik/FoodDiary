@@ -1,4 +1,4 @@
-package com.example.fooddiary.data.database
+package com.example.fooddiary.data_old.database
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

@@ -1,9 +1,9 @@
 package com.example.fooddiary.di
 
 import android.content.Context
-import com.example.fooddiary.data.api.ApiClient
-import com.example.fooddiary.data.database.BarcodeDatabase
-import com.example.fooddiary.data.repository.BarcodeRepository
+import com.example.fooddiary.data_old.api.ApiClient
+import com.example.fooddiary.data_old.database.BarcodeDatabase
+import com.example.fooddiary.data_old.repository.BarcodeRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase

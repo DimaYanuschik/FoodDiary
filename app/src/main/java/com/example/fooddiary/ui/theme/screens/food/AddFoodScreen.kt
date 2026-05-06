@@ -6,18 +6,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.fooddiary.data.models.BarcodeProduct
-import com.example.fooddiary.data.models.ScannedFoodEntry
-import com.example.fooddiary.data.repository.FoodEntry
+import com.example.fooddiary.data_old.models.ScannedFoodEntry
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import java.util.*
-import kotlin.String
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,10 +1,10 @@
-package com.example.fooddiary.data.database
+package com.example.fooddiary.data_old.database
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.fooddiary.data.models.BarcodeProduct
+import com.example.fooddiary.data_old.models.BarcodeProduct
 import kotlinx.coroutines.flow.Flow
 
 @Dao

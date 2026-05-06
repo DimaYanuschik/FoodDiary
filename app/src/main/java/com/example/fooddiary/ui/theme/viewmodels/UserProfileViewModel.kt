@@ -2,12 +2,12 @@ package com.example.fooddiary.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fooddiary.data.models.ActivityLevel
-import com.example.fooddiary.data.models.Gender
-import com.example.fooddiary.data.models.Goal
-import com.example.fooddiary.data.models.UserProfile
-import com.example.fooddiary.data.repository.UserProfileRepository
-import com.example.fooddiary.data.services.CalorieCalculator
+import com.example.fooddiary.data_old.models.ActivityLevel
+import com.example.fooddiary.data_old.models.Gender
+import com.example.fooddiary.data_old.models.Goal
+import com.example.fooddiary.data_old.models.UserProfile
+import com.example.fooddiary.data_old.repository.UserProfileRepository
+import com.example.fooddiary.data_old.services.CalorieCalculator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

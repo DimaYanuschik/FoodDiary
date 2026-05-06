@@ -1,4 +1,4 @@
-package com.example.fooddiary.data.models
+package com.example.fooddiary.data_old.models
 
 import java.util.*
 

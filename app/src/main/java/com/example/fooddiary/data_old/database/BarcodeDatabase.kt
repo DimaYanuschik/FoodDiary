@@ -1,11 +1,11 @@
-package com.example.fooddiary.data.database
+package com.example.fooddiary.data_old.database
 
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import android.content.Context
-import com.example.fooddiary.data.models.BarcodeProduct
+import com.example.fooddiary.data_old.models.BarcodeProduct
 
 @Database(
     entities = [BarcodeProduct::class],

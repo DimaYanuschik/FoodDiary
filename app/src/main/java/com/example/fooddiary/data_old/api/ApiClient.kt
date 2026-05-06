@@ -1,4 +1,4 @@
-package com.example.fooddiary.data.api
+package com.example.fooddiary.data_old.api
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

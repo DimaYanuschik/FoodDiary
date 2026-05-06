@@ -1,4 +1,4 @@
-package com.example.fooddiary.data.auth
+package com.example.fooddiary.data_old.auth
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth

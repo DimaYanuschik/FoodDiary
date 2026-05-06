@@ -13,8 +13,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.fooddiary.data.repository.DailyStats
+import com.example.fooddiary.data_old.repository.DailyStats
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import java.text.SimpleDateFormat
 import java.util.*

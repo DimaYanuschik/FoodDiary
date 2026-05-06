@@ -7,7 +7,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -28,16 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.fooddiary.data.models.BarcodeScanResult
+import com.example.fooddiary.data_old.models.BarcodeScanResult
 import com.example.fooddiary.ui.viewmodels.BarcodeScanState
 import com.example.fooddiary.ui.viewmodels.BarcodeViewModel
-import com.example.fooddiary.utils.CameraUtils
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-
-import com.example.fooddiary.utils.CameraUtils.toBitmap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

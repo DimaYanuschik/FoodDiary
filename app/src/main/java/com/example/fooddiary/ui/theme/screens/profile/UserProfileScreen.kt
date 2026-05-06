@@ -14,7 +14,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.fooddiary.data.models.*
+import com.example.fooddiary.data_old.models.*
 import com.example.fooddiary.ui.components.DatePicker
 import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
 import java.text.SimpleDateFormat

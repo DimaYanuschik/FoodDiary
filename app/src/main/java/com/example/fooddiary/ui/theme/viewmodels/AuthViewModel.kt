@@ -2,7 +2,7 @@ package com.example.fooddiary.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fooddiary.data.auth.AuthRepository
+import com.example.fooddiary.data_old.auth.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

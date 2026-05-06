@@ -1,8 +1,8 @@
-package com.example.fooddiary.data.services
+package com.example.fooddiary.data_old.services
 
-import com.example.fooddiary.data.models.Gender
-import com.example.fooddiary.data.models.Goal
-import com.example.fooddiary.data.models.UserProfile
+import com.example.fooddiary.data_old.models.Gender
+import com.example.fooddiary.data_old.models.Goal
+import com.example.fooddiary.data_old.models.UserProfile
 
 object CalorieCalculator {
 

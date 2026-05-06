@@ -149,8 +149,8 @@ private fun HeaderCard() {
 
 @Composable
 private fun CalorieMetricsSection(
-    dailyStats: com.example.fooddiary.data.repository.DailyStats,
-    calorieGoal: com.example.fooddiary.data.models.CalorieGoal
+    dailyStats: com.example.fooddiary.data_old.repository.DailyStats,
+    calorieGoal: com.example.fooddiary.data_old.models.CalorieGoal
 ) {
     Card(
         modifier = Modifier
@@ -213,8 +213,8 @@ private fun CalorieMetricsSection(
 
 @Composable
 private fun MacroDistributionSection(
-    dailyStats: com.example.fooddiary.data.repository.DailyStats,
-    calorieGoal: com.example.fooddiary.data.models.CalorieGoal?
+    dailyStats: com.example.fooddiary.data_old.repository.DailyStats,
+    calorieGoal: com.example.fooddiary.data_old.models.CalorieGoal?
 ) {
     Card(
         modifier = Modifier
@@ -273,8 +273,8 @@ private fun WeeklyProgressSection(
 
 @Composable
 private fun SummarySection(
-    dailyStats: com.example.fooddiary.data.repository.DailyStats,
-    calorieGoal: com.example.fooddiary.data.models.CalorieGoal?
+    dailyStats: com.example.fooddiary.data_old.repository.DailyStats,
+    calorieGoal: com.example.fooddiary.data_old.models.CalorieGoal?
 ) {
     Card(
         modifier = Modifier
@@ -387,8 +387,8 @@ private fun SummaryItem(
 
 @Composable
 private fun AdviceSection(
-    dailyStats: com.example.fooddiary.data.repository.DailyStats,
-    calorieGoal: com.example.fooddiary.data.models.CalorieGoal?
+    dailyStats: com.example.fooddiary.data_old.repository.DailyStats,
+    calorieGoal: com.example.fooddiary.data_old.models.CalorieGoal?
 ) {
     Card(
         modifier = Modifier

@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.fooddiary.data.models.CalorieGoal
+import com.example.fooddiary.data_old.models.CalorieGoal
 import com.example.fooddiary.ui.viewmodels.CalorieGoalViewModel
 import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
 import kotlin.math.roundToInt
@@ -408,10 +408,10 @@ fun CalorieGoalScreen(
     }
 }
 
-private fun getDefaultMacroPercentages(goal: com.example.fooddiary.data.models.Goal): Triple<Int, Int, Int> {
+private fun getDefaultMacroPercentages(goal: com.example.fooddiary.data_old.models.Goal): Triple<Int, Int, Int> {
     return when (goal) {
-        com.example.fooddiary.data.models.Goal.LOSE_WEIGHT -> Triple(40, 30, 30)
-        com.example.fooddiary.data.models.Goal.MAINTAIN -> Triple(30, 30, 40)
-        com.example.fooddiary.data.models.Goal.GAIN_WEIGHT -> Triple(25, 25, 50)
+        com.example.fooddiary.data_old.models.Goal.LOSE_WEIGHT -> Triple(40, 30, 30)
+        com.example.fooddiary.data_old.models.Goal.MAINTAIN -> Triple(30, 30, 40)
+        com.example.fooddiary.data_old.models.Goal.GAIN_WEIGHT -> Triple(25, 25, 50)
     }
 }

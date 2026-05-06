@@ -1,8 +1,6 @@
 package com.example.fooddiary.ui.screens.food
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -12,11 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.fooddiary.data.repository.FoodEntry
+import com.example.fooddiary.data_old.repository.FoodEntry
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Composable
 fun FoodListScreen(
