@@ -20,9 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddiary.data_old.auth.AuthRepository
 import com.example.fooddiary.data_old.models.BarcodeScanResult
+import com.example.fooddiary.presentation.screens.home.HomeViewModel
 import com.example.fooddiary.ui.screens.camera.CameraScreen
 import com.example.fooddiary.ui.screens.camera.GalleryPickerScreen
 import com.example.fooddiary.ui.screens.food.AddFoodScreen
@@ -39,7 +41,12 @@ import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
 @Composable
 fun HomeScreen(
     onLogout: () -> Unit,
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
+    val userId by homeViewModel.userId.collectAsStateWithLifecycle()
+    val isLoadingUser by homeViewModel.isLoading.collectAsStateWithLifecycle()
+
+
     var showCameraScreen by remember { mutableStateOf(false) }
     var showGalleryScreen by remember { mutableStateOf(false) }
     var showAddFoodScreen by remember { mutableStateOf(false) }
@@ -49,6 +56,8 @@ fun HomeScreen(
     var showBarcodeScanner by remember { mutableStateOf(false) }
 
     var barcodeResult by remember { mutableStateOf<BarcodeScanResult?>(null) }
+
+
 
     // Определяем, какой экран показывать
     when {
@@ -88,10 +97,15 @@ fun HomeScreen(
         }
 
         showProfileScreen -> {
-            UserProfileScreen(
-                onComplete = { showProfileScreen = false },
-                onNavigateBack = { showProfileScreen = false }
-            )
+            if(userId.isNotEmpty()) {
+                UserProfileScreen(
+                    onComplete = { showProfileScreen = false },
+                    onNavigateBack = { showProfileScreen = false },
+                    userId = userId
+                )
+            } else {
+                showProfileScreen = false
+            }
         }
 
         showGoalsScreen -> {
@@ -124,16 +138,26 @@ fun HomeScreen(
 
 
         else -> {
-            MainHomeScreen(
-                onLogout = onLogout,
-                onOpenCamera = { showCameraScreen = true },
-                onOpenGallery = { showGalleryScreen = true },
-                onOpenAddFood = { showAddFoodScreen = true },
-                onOpenStats = { showStatsScreen = true },
-                onOpenProfile = { showProfileScreen = true },
-                onOpenGoals = { showGoalsScreen = true },
-                onOpenBarcodeScanner = { showBarcodeScanner = true }
-            )
+            if (!isLoadingUser) {
+                MainHomeScreen(
+                    onLogout = onLogout,
+                    onOpenCamera = { showCameraScreen = true },
+                    onOpenGallery = { showGalleryScreen = true },
+                    onOpenAddFood = { showAddFoodScreen = true },
+                    onOpenStats = { showStatsScreen = true },
+                    onOpenProfile = { showProfileScreen = true },
+                    onOpenGoals = { showGoalsScreen = true },
+                    onOpenBarcodeScanner = { showBarcodeScanner = true },
+                    userId = userId
+                )
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }
@@ -148,17 +172,15 @@ fun MainHomeScreen(
     onOpenStats: () -> Unit,
     onOpenProfile: () -> Unit,
     onOpenGoals: () -> Unit,
-    onOpenBarcodeScanner: () -> Unit
+    onOpenBarcodeScanner: () -> Unit,
+    userId: String
 ) {
-//    val foodViewModel: FoodViewModel = viewModel()
     val foodViewModel: FoodViewModel = hiltViewModel()
-
     val userProfileViewModel: UserProfileViewModel = viewModel()
     val calorieGoalViewModel: CalorieGoalViewModel = viewModel()
-    val authRepository = AuthRepository()
 
-    LaunchedEffect(Unit) {
-        authRepository.currentUser?.uid?.let { userId ->
+    LaunchedEffect(userId) {
+        if (userId.isNotEmpty()) {
             foodViewModel.setUserId(userId)
             userProfileViewModel.setUserId(userId)
             calorieGoalViewModel.setUserId(userId)
@@ -226,8 +248,6 @@ fun MainHomeScreen(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
-
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {

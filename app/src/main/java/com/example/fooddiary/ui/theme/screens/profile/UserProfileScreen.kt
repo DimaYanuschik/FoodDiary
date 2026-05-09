@@ -25,12 +25,18 @@ import kotlin.math.max
 @Composable
 fun UserProfileScreen(
     onComplete: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    userId: String
 ) {
     val viewModel: UserProfileViewModel = viewModel()
     val userProfile by viewModel.userProfile.collectAsState()
     val calculatedCalories by viewModel.calculatedCalories.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.setUserId(userId)
+        viewModel.resetSaveSuccess()
+    }
 
     // Состояния для формы
     var name by remember { mutableStateOf(userProfile?.name ?: "") }
@@ -143,6 +149,15 @@ fun UserProfileScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
+                    val saveSuccess by viewModel.saveSuccess.collectAsState()
+
+
+                    LaunchedEffect(saveSuccess) {
+                        if (saveSuccess) {
+                            viewModel.resetSaveSuccess()
+                            onComplete()
+                        }
+                    }
                     Button(
                         onClick = {
                             val profile = UserProfile(
@@ -158,7 +173,7 @@ fun UserProfileScreen(
                                 updatedAt = Date()
                             )
                             viewModel.saveUserProfile(profile)
-                            onComplete()
+                            // onComplete()
                         },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = isFormValid && !isLoading

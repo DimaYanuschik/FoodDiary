@@ -1,4 +1,4 @@
-// MainActivity.kt
+// MainActivity.kt - исправленная версия
 package com.example.fooddiary
 
 import android.os.Bundle
@@ -13,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.fooddiary.data_old.repository.UserProfileRepository
 import com.example.fooddiary.presentation.screens.auth.AuthViewModel
 import com.example.fooddiary.presentation.screens.auth.LoginScreen
 import com.example.fooddiary.presentation.screens.auth.RegisterScreen
@@ -20,7 +21,9 @@ import com.example.fooddiary.ui.screens.main.HomeScreen
 import com.example.fooddiary.ui.screens.profile.CalorieGoalScreen
 import com.example.fooddiary.ui.screens.profile.UserProfileScreen
 import com.example.fooddiary.ui.theme.FoodDiaryTheme
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -45,12 +48,41 @@ fun MainNavigation() {
     val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsState()
 
-    // Определяем стартовый экран на основе состояния авторизации
-    val startDestination = remember(authState) {
+    // Состояние для проверки наличия профиля
+    var hasProfile by remember { mutableStateOf(false) }
+    var isCheckingProfile by remember { mutableStateOf(true) }
+    var lastCheckedUserId by remember { mutableStateOf<String?>(null) }
+
+    // Проверяем наличие профиля при изменении authState
+    LaunchedEffect(authState) {
+        if (authState != null) {
+            val userId = authState!!.uid
+            // Проверяем только если userId изменился
+            if (lastCheckedUserId != userId) {
+                lastCheckedUserId = userId
+                val repository = UserProfileRepository()
+                val profile = try {
+                    runBlocking { repository.getUserProfile(userId) }
+                } catch (e: Exception) {
+                    null
+                }
+                hasProfile = profile != null
+            }
+        } else {
+            // Пользователь вышел - сбрасываем состояние
+            hasProfile = false
+            lastCheckedUserId = null
+        }
+        isCheckingProfile = false
+    }
+
+    // Определяем стартовый экран
+    val startDestination = remember(authState, hasProfile, isCheckingProfile) {
         when {
+            isCheckingProfile -> "login" // Пока проверяем, показываем login
             authState == null -> "login"
-            authState?.isEmailVerified == true -> "home"
-            else -> "profile_setup"
+            hasProfile -> "home"  // Если профиль есть - сразу на главный
+            else -> "profile_setup"  // Если профиля нет - на создание
         }
     }
 
@@ -95,6 +127,7 @@ fun MainNavigation() {
 
         // Profile Setup Screen
         composable("profile_setup") {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             UserProfileScreen(
                 onComplete = {
                     navController.navigate("home") {
@@ -106,7 +139,8 @@ fun MainNavigation() {
                     navController.navigate("login") {
                         popUpTo("profile_setup") { inclusive = true }
                     }
-                }
+                },
+                userId = userId
             )
         }
 

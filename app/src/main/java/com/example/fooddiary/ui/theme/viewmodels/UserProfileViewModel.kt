@@ -65,52 +65,51 @@ class UserProfileViewModel : ViewModel() {
     }
 
     fun saveUserProfile(profile: UserProfile) {
-        currentUserId?.let { userId ->
-            viewModelScope.launch {
-                _isLoading.value = true
-                _errorMessage.value = null
-                _saveSuccess.value = false
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            _saveSuccess.value = false
 
-                try {
-                    // Создаем профиль с текущим userId
-                    val profileToSave = if (profile.id.isNotEmpty() && _userProfile.value?.id == profile.id) {
-                        // Если это обновление существующего профиля
-                        profile.copy(
-                            userId = userId,
-                            updatedAt = Date()
-                        )
-                    } else {
-                        // Если это новый профиль, сохраняем ID существующего или создаем новый
-                        val existingId = _userProfile.value?.id ?: ""
-                        profile.copy(
-                            id = existingId,
-                            userId = userId,
-                            createdAt = _userProfile.value?.createdAt ?: Date(),
-                            updatedAt = Date()
-                        )
-                    }
-
-                    val savedId = userProfileRepository.saveUserProfile(profileToSave)
-
-                    // Загружаем обновленный профиль
-                    val updatedProfile = userProfileRepository.getUserProfileById(savedId)
-                    _userProfile.value = updatedProfile
-
-                    // Пересчитываем калории
-                    updatedProfile?.let {
-                        _calculatedCalories.value = CalorieCalculator.calculateTargetCalories(it)
-                    }
-
-                    _saveSuccess.value = true
-
-                } catch (e: Exception) {
-                    _errorMessage.value = "Ошибка сохранения профиля: ${e.message}"
-                } finally {
-                    _isLoading.value = false
+            try {
+                val userId = currentUserId
+                if (userId == null) {
+                    _errorMessage.value = "Пользователь не авторизован"
+                    return@launch
                 }
+
+                println("DEBUG: Saving profile for userId: $userId")
+
+                // Создаем профиль с правильным userId
+                val profileToSave = profile.copy(
+                    userId = userId,
+                    updatedAt = Date()
+                )
+
+                println("DEBUG: Profile to save: $profileToSave")
+
+                // Сохраняем в Firebase
+                val savedId = userProfileRepository.saveUserProfile(profileToSave)
+                println("DEBUG: Saved with ID: $savedId")
+
+                // Загружаем обновленный профиль
+                val updatedProfile = userProfileRepository.getUserProfileById(savedId)
+                _userProfile.value = updatedProfile
+                println("DEBUG: Loaded profile after save: $updatedProfile")
+
+                // Пересчитываем калории
+                updatedProfile?.let {
+                    _calculatedCalories.value = CalorieCalculator.calculateTargetCalories(it)
+                }
+
+                _saveSuccess.value = true
+                println("DEBUG: Save success!")
+
+            } catch (e: Exception) {
+                println("DEBUG: Error: ${e.message}")
+                _errorMessage.value = "Ошибка сохранения профиля: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
-        } ?: run {
-            _errorMessage.value = "Пользователь не авторизован"
         }
     }
 

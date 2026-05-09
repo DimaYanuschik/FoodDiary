@@ -123,6 +123,16 @@ class AuthViewModel @Inject constructor(
             _authState.value = null
         }
     }
+
+    fun clearForms() {
+        _loginUiState.value = LoginUiState()
+        _registerUiState.value = RegisterUiState()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        clearForms()
+    }
 }
 
 // State data classes

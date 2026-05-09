@@ -25,6 +25,10 @@ fun RegisterScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.clearForms()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
