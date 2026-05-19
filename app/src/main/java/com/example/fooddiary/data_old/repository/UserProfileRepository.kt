@@ -1,5 +1,6 @@
 package com.example.fooddiary.data_old.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -45,18 +46,46 @@ class UserProfileRepository {
         }
     }
 
+//    suspend fun getUserProfile(userId: String): UserProfile? {
+//        return try {
+//            Log.d("UserProfileRepo", "Запрос профиля для userId: $userId")
+//            val snapshot = db.collection(COLLECTION_USER_PROFILES)
+//                .whereEqualTo("userId", userId)
+//                .limit(1)
+//                .get()
+//                .await()
+//            Log.d("UserProfileRepo", "Получено документов: ${snapshot.documents.size}")
+//
+//            snapshot.documents.firstOrNull()?.let { document ->
+//                Log.d("UserProfileRepo", "Документ найден: id = ${document.id}, data = ${document.data}")
+//                document.toObject(UserProfile::class.java)?.copy(id = document.id)
+//            }
+//        } catch (e: Exception) {
+//            null
+//        }
+//    }
+
     suspend fun getUserProfile(userId: String): UserProfile? {
         return try {
+            Log.d("UserProfileRepo", "Запрос профиля для userId: $userId")
             val snapshot = db.collection(COLLECTION_USER_PROFILES)
                 .whereEqualTo("userId", userId)
                 .limit(1)
                 .get()
                 .await()
+            Log.d("UserProfileRepo", "Получено документов: ${snapshot.documents.size}")
 
             snapshot.documents.firstOrNull()?.let { document ->
-                document.toObject(UserProfile::class.java)?.copy(id = document.id)
+                Log.d("UserProfileRepo", "Документ найден: id = ${document.id}, data = ${document.data}")
+                val profile = document.toObject(UserProfile::class.java)?.copy(id = document.id)
+                Log.d("UserProfileRepo", "Десериализованный профиль: $profile")
+                profile
+            } ?: run {
+                Log.w("UserProfileRepo", "Профиль для userId=$userId не найден в Firestore!")
+                null
             }
         } catch (e: Exception) {
+            Log.e("UserProfileRepo", "Ошибка загрузки профиля", e)
             null
         }
     }

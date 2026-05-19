@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddiary.data_old.models.*
 import com.example.fooddiary.ui.components.DatePicker
@@ -26,15 +28,26 @@ import kotlin.math.max
 fun UserProfileScreen(
     onComplete: () -> Unit,
     onNavigateBack: () -> Unit,
-    userId: String
+//    viewModel: UserProfileViewModel = hiltViewModel()
+    sharedViewModelStoreOwner: ViewModelStoreOwner? = null,
+    // Для разделения настройки профиля после регистрации и просто редактирования
+    viewModel: UserProfileViewModel = if (sharedViewModelStoreOwner != null) {
+        hiltViewModel(sharedViewModelStoreOwner)
+    } else  {
+        hiltViewModel()
+    }
+//    userId: String
 ) {
-    val viewModel: UserProfileViewModel = viewModel()
     val userProfile by viewModel.userProfile.collectAsState()
     val calculatedCalories by viewModel.calculatedCalories.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+//    LaunchedEffect(Unit) {
+//        viewModel.setUserId(userId)
+//        viewModel.resetSaveSuccess()
+//    }
+
     LaunchedEffect(Unit) {
-        viewModel.setUserId(userId)
         viewModel.resetSaveSuccess()
     }
 
@@ -85,6 +98,19 @@ fun UserProfileScreen(
                 weight.isNotBlank() && weight.toDoubleOrNull() != null && weight.toDouble() > 0 &&
                 height.isNotBlank() && height.toIntOrNull() != null && height.toInt() > 0
     }
+
+    // Костыль TODO: исправить
+//    LaunchedEffect(userProfile) {
+//        userProfile?.let { profile ->
+//            name = profile.name
+//            gender = profile.gender
+//            birthDate = profile.birthDate
+//            weight = profile.weight.toString()
+//            height = profile.height.toString()
+//            activityLevel = profile.activityLevel
+//            goal = profile.goal
+//        }
+//    }
 
 
     if (showDatePicker) {
@@ -199,6 +225,7 @@ fun UserProfileScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Text(text = "${viewModel.currentUserId}")
             // Имя
             OutlinedTextField(
                 value = name,

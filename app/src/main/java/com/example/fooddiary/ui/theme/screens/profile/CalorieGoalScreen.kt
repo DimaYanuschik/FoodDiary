@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddiary.data_old.models.CalorieGoal
 import com.example.fooddiary.ui.viewmodels.CalorieGoalViewModel
@@ -22,10 +24,14 @@ import kotlin.math.roundToInt
 @Composable
 fun CalorieGoalScreen(
     onComplete: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+
+    sharedViewModelStoreOwner: ViewModelStoreOwner,
+    calorieGoalViewModel: CalorieGoalViewModel = hiltViewModel(sharedViewModelStoreOwner),
+    userProfileViewModel: UserProfileViewModel = hiltViewModel(sharedViewModelStoreOwner)
 ) {
-    val calorieGoalViewModel: CalorieGoalViewModel = viewModel()
-    val userProfileViewModel: UserProfileViewModel = viewModel()
+//    val calorieGoalViewModel: CalorieGoalViewModel = viewModel()
+//    val userProfileViewModel: UserProfileViewModel = viewModel()
 
     val calorieGoal by calorieGoalViewModel.calorieGoal.collectAsState()
     val userProfile by userProfileViewModel.userProfile.collectAsState()

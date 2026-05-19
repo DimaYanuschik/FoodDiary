@@ -7,6 +7,7 @@ import com.example.fooddiary.data_old.models.ScannedFoodEntry
 import com.example.fooddiary.data_old.repository.FoodEntry
 import com.example.fooddiary.data_old.repository.FoodRepository
 import com.example.fooddiary.data_old.repository.DailyStats
+import com.example.fooddiary.domain.repository.auth.IAuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,11 +18,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FoodViewModel @Inject constructor(
-    private val foodRepository: FoodRepository
+    private val foodRepository: FoodRepository,
+    private val authRepository: IAuthRepository
 ) : ViewModel() {
-//class FoodViewModel() : ViewModel() {
-
-//    private val foodRepository = FoodRepository()
 
     private val _foodEntries = MutableStateFlow<List<FoodEntry>>(emptyList())
     val foodEntries: StateFlow<List<FoodEntry>> = _foodEntries.asStateFlow()
@@ -41,24 +40,29 @@ class FoodViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    var currentUserId: String? = null
+//    var currentUserId: String? = null
+    private val currentUserId: String? = authRepository.getCurrentUser()?.uid
 
     init {
-        viewModelScope.launch {
-            currentUserId?.let { userId ->
-                foodRepository.testQueries(userId)
-            }
-        }
+        loadAllData()
     }
 
+//    init {
+//        viewModelScope.launch {
+//            currentUserId?.let { userId ->
+//                foodRepository.testQueries(userId)
+//            }
+//        }
+//    }
 
-    fun setUserId(userId: String) {
-        Log.d("FoodViewModel", "setUserId: $userId")
-        if (currentUserId != userId) {
-            currentUserId = userId
-            loadAllData()
-        }
-    }
+
+//    fun setUserId(userId: String) {
+//        Log.d("FoodViewModel", "setUserId: $userId")
+//        if (currentUserId != userId) {
+//            currentUserId = userId
+//            loadAllData()
+//        }
+//    }
 
     fun loadAllData() {
         currentUserId?.let { userId ->

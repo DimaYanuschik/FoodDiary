@@ -41,130 +41,161 @@ import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
 @Composable
 fun HomeScreen(
     onLogout: () -> Unit,
+    onNavigateToCamera: () -> Unit,
+    onNavigateToGallery: () -> Unit,
+    onNavigateToAddFood: () -> Unit,
+    onNavigateToStats: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+    onNavigateToGoals: () -> Unit,
+    onNavigateToBarcodeScanner: () -> Unit,
+    onNavigateToSearch: () -> Unit,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val userId by homeViewModel.userId.collectAsStateWithLifecycle()
     val isLoadingUser by homeViewModel.isLoading.collectAsStateWithLifecycle()
 
+//  Старая навигация с флагами
+//    var showCameraScreen by remember { mutableStateOf(false) }
+//    var showGalleryScreen by remember { mutableStateOf(false) }
+//    var showAddFoodScreen by remember { mutableStateOf(false) }
+//    var showStatsScreen by remember { mutableStateOf(false) }
+//    var showProfileScreen by remember { mutableStateOf(false) }
+//    var showGoalsScreen by remember { mutableStateOf(false) }
+//    var showBarcodeScanner by remember { mutableStateOf(false) }
+//
+//    var barcodeResult by remember { mutableStateOf<BarcodeScanResult?>(null) }
+//
+//
+//
+//    // Определяем, какой экран показывать
+//    when {
+//        showCameraScreen -> {
+//            CameraScreen(
+//                onPhotoTaken = { uri ->
+//                    println("Фото сделано: $uri")
+//                    showCameraScreen = false
+//                    showAddFoodScreen = true
+//                },
+//                onNavigateBack = { showCameraScreen = false }
+//            )
+//        }
+//
+//        showGalleryScreen -> {
+//            GalleryPickerScreen(
+//                onImageSelected = { uri ->
+//                    println("Фото выбрано: $uri")
+//                    showGalleryScreen = false
+//                    showAddFoodScreen = true
+//                },
+//                onNavigateBack = { showGalleryScreen = false }
+//            )
+//        }
+//
+//        showAddFoodScreen -> {
+//            AddFoodScreen(
+//                onNavigateBack = { showAddFoodScreen = false },
+//                onFoodAdded = { showAddFoodScreen = false }
+//            )
+//        }
+//
+//        showStatsScreen -> {
+//            EnhancedStatsScreen(
+//                onNavigateBack = { showStatsScreen = false }
+//            )
+//        }
+//
+//        showProfileScreen -> {
+//            if(userId.isNotEmpty()) {
+//                UserProfileScreen(
+//                    onComplete = { showProfileScreen = false },
+//                    onNavigateBack = { showProfileScreen = false },
+//                    userId = userId
+//                )
+//            } else {
+//                showProfileScreen = false
+//            }
+//        }
+//
+//        showGoalsScreen -> {
+//            CalorieGoalScreen(
+//                onComplete = { showGoalsScreen = false },
+//                onNavigateBack = { showGoalsScreen = false }
+//            )
+//        }
+//
+//        showBarcodeScanner -> {
+//            BarcodeScannerScreen(
+//                onProductFound = { result ->
+//                    barcodeResult = result
+//                    showBarcodeScanner = false
+//                },
+//                onNavigateBack = { showBarcodeScanner = false }
+//            )
+//        }
+//
+//        barcodeResult != null -> {
+//            BarcodeProductScreen(
+//                scanResult = barcodeResult!!,
+//                onAddToDiary = {
+//                    // После добавления в дневник
+//                    barcodeResult = null
+//                },
+//                onNavigateBack = { barcodeResult = null }
+//            )
+//        }
+//
+//
+//        else -> {
+//            if (!isLoadingUser) {
+//                MainHomeScreen(
+//                    onLogout = onLogout,
+//                    onOpenCamera = { showCameraScreen = true },
+//                    onOpenGallery = { showGalleryScreen = true },
+//                    onOpenAddFood = { showAddFoodScreen = true },
+//                    onOpenStats = { showStatsScreen = true },
+//                    onOpenProfile = { showProfileScreen = true },
+//                    onOpenGoals = { showGoalsScreen = true },
+//                    onOpenBarcodeScanner = { showBarcodeScanner = true },
+//                    userId = userId
+//                )
+//            } else {
+//                Box(
+//                    modifier = Modifier.fillMaxSize(),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    CircularProgressIndicator()
+//                }
+//            }
+//        }
+//    }
 
-    var showCameraScreen by remember { mutableStateOf(false) }
-    var showGalleryScreen by remember { mutableStateOf(false) }
-    var showAddFoodScreen by remember { mutableStateOf(false) }
-    var showStatsScreen by remember { mutableStateOf(false) }
-    var showProfileScreen by remember { mutableStateOf(false) }
-    var showGoalsScreen by remember { mutableStateOf(false) }
-    var showBarcodeScanner by remember { mutableStateOf(false) }
-
-    var barcodeResult by remember { mutableStateOf<BarcodeScanResult?>(null) }
-
-
-
-    // Определяем, какой экран показывать
-    when {
-        showCameraScreen -> {
-            CameraScreen(
-                onPhotoTaken = { uri ->
-                    println("Фото сделано: $uri")
-                    showCameraScreen = false
-                    showAddFoodScreen = true
-                },
-                onNavigateBack = { showCameraScreen = false }
-            )
+    if (isLoadingUser) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
-
-        showGalleryScreen -> {
-            GalleryPickerScreen(
-                onImageSelected = { uri ->
-                    println("Фото выбрано: $uri")
-                    showGalleryScreen = false
-                    showAddFoodScreen = true
-                },
-                onNavigateBack = { showGalleryScreen = false }
-            )
-        }
-
-        showAddFoodScreen -> {
-            AddFoodScreen(
-                onNavigateBack = { showAddFoodScreen = false },
-                onFoodAdded = { showAddFoodScreen = false }
-            )
-        }
-
-        showStatsScreen -> {
-            EnhancedStatsScreen(
-                onNavigateBack = { showStatsScreen = false }
-            )
-        }
-
-        showProfileScreen -> {
-            if(userId.isNotEmpty()) {
-                UserProfileScreen(
-                    onComplete = { showProfileScreen = false },
-                    onNavigateBack = { showProfileScreen = false },
-                    userId = userId
-                )
-            } else {
-                showProfileScreen = false
-            }
-        }
-
-        showGoalsScreen -> {
-            CalorieGoalScreen(
-                onComplete = { showGoalsScreen = false },
-                onNavigateBack = { showGoalsScreen = false }
-            )
-        }
-
-        showBarcodeScanner -> {
-            BarcodeScannerScreen(
-                onProductFound = { result ->
-                    barcodeResult = result
-                    showBarcodeScanner = false
-                },
-                onNavigateBack = { showBarcodeScanner = false }
-            )
-        }
-
-        barcodeResult != null -> {
-            BarcodeProductScreen(
-                scanResult = barcodeResult!!,
-                onAddToDiary = {
-                    // После добавления в дневник
-                    barcodeResult = null
-                },
-                onNavigateBack = { barcodeResult = null }
-            )
-        }
-
-
-        else -> {
-            if (!isLoadingUser) {
-                MainHomeScreen(
-                    onLogout = onLogout,
-                    onOpenCamera = { showCameraScreen = true },
-                    onOpenGallery = { showGalleryScreen = true },
-                    onOpenAddFood = { showAddFoodScreen = true },
-                    onOpenStats = { showStatsScreen = true },
-                    onOpenProfile = { showProfileScreen = true },
-                    onOpenGoals = { showGoalsScreen = true },
-                    onOpenBarcodeScanner = { showBarcodeScanner = true },
-                    userId = userId
-                )
-            } else {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-        }
+    } else {
+        MainHomeScreen(
+//            userId = userId,
+            onLogout = onLogout,
+            onOpenCamera = onNavigateToCamera,
+            onOpenGallery = onNavigateToGallery,
+            onOpenAddFood = onNavigateToAddFood,
+            onOpenStats = onNavigateToStats,
+            onOpenProfile = onNavigateToProfile,
+            onOpenGoals = onNavigateToGoals,
+            onOpenBarcodeScanner = onNavigateToBarcodeScanner,
+            onOpenSearch = onNavigateToSearch
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainHomeScreen(
+//    userId: String,
     onLogout: () -> Unit,
     onOpenCamera: () -> Unit,
     onOpenGallery: () -> Unit,
@@ -173,19 +204,19 @@ fun MainHomeScreen(
     onOpenProfile: () -> Unit,
     onOpenGoals: () -> Unit,
     onOpenBarcodeScanner: () -> Unit,
-    userId: String
+    onOpenSearch: () -> Unit
 ) {
     val foodViewModel: FoodViewModel = hiltViewModel()
-    val userProfileViewModel: UserProfileViewModel = viewModel()
-    val calorieGoalViewModel: CalorieGoalViewModel = viewModel()
+    val userProfileViewModel: UserProfileViewModel = hiltViewModel()
+    val calorieGoalViewModel: CalorieGoalViewModel = hiltViewModel()
 
-    LaunchedEffect(userId) {
-        if (userId.isNotEmpty()) {
-            foodViewModel.setUserId(userId)
-            userProfileViewModel.setUserId(userId)
-            calorieGoalViewModel.setUserId(userId)
-        }
-    }
+//    LaunchedEffect(userId) {
+//        if (userId.isNotEmpty()) {
+//            foodViewModel.setUserId(userId)
+//            userProfileViewModel.setUserId(userId)
+//            calorieGoalViewModel.setUserId(userId)
+//        }
+//    }
 
     val userProfile by userProfileViewModel.userProfile.collectAsState()
     val calorieGoal by calorieGoalViewModel.calorieGoal.collectAsState()
@@ -292,6 +323,13 @@ fun MainHomeScreen(
                         },
                         modifier = Modifier.weight(1f)
                     )
+
+                    HomeActionButton(
+                        icon = Icons.Filled.Search,
+                        text = "Поиск",
+                        onClick = onOpenSearch,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
 
@@ -355,7 +393,8 @@ fun FoodListScreenWithScroll(
     onAddFoodClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: FoodViewModel = viewModel()
+//    val viewModel: FoodViewModel = viewModel()
+    val viewModel: FoodViewModel = hiltViewModel()
     val todayFoodEntries by viewModel.todayFoodEntries.collectAsState()
     val dailyStats by viewModel.dailyStats.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()

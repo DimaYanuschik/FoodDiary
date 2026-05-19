@@ -8,13 +8,19 @@ import com.example.fooddiary.data_old.models.Goal
 import com.example.fooddiary.data_old.models.UserProfile
 import com.example.fooddiary.data_old.repository.UserProfileRepository
 import com.example.fooddiary.data_old.services.CalorieCalculator
+import com.example.fooddiary.domain.repository.auth.IAuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
-class UserProfileViewModel : ViewModel() {
+@HiltViewModel
+class UserProfileViewModel @Inject constructor(
+    private val authRepository: IAuthRepository
+): ViewModel() {
     private val userProfileRepository = UserProfileRepository()
 
     private val _userProfile = MutableStateFlow<UserProfile?>(null)
@@ -32,15 +38,32 @@ class UserProfileViewModel : ViewModel() {
     private val _saveSuccess = MutableStateFlow(false)
     val saveSuccess: StateFlow<Boolean> = _saveSuccess.asStateFlow()
 
-    var currentUserId: String? = null
-        private set
+//    var currentUserId: String? = null
+//        private set
+    var currentUserId: String? = authRepository.getCurrentUser()?.uid
 
-    fun setUserId(userId: String) {
-        if (currentUserId != userId) {
-            currentUserId = userId
-            loadUserProfile()
-        }
+    init {
+        loadUserProfile()
+
+//        // Подписываемся на изменение авторизации, чтобы загрузить профиль при входе
+//        viewModelScope.launch {
+//            authRepository.authStateFlow().collect { user ->
+//                if (user != null) {
+//                    currentUserId = user.uid
+//                    loadUserProfile()
+//                } else {
+//                    _userProfile.value = null
+//                }
+//            }
+//        }
     }
+
+//    fun setUserId(userId: String) {
+//        if (currentUserId != userId) {
+//            currentUserId = userId
+//            loadUserProfile()
+//        }
+//    }
 
     fun loadUserProfile() {
         currentUserId?.let { userId ->

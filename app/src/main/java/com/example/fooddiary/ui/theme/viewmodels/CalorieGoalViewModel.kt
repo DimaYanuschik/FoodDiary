@@ -4,12 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fooddiary.data_old.models.CalorieGoal
 import com.example.fooddiary.data_old.repository.CalorieGoalRepository
+import com.example.fooddiary.domain.repository.auth.IAuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CalorieGoalViewModel : ViewModel() {
+@HiltViewModel
+class CalorieGoalViewModel @Inject constructor(
+    private val authRepository: IAuthRepository
+) : ViewModel() {
     private val calorieGoalRepository = CalorieGoalRepository()
 
     private val _calorieGoal = MutableStateFlow<CalorieGoal?>(null)
@@ -21,14 +27,19 @@ class CalorieGoalViewModel : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    var currentUserId: String? = null
+//    var currentUserId: String? = null
+    var currentUserId: String? = authRepository.getCurrentUser()?.uid
 
-    fun setUserId(userId: String) {
-        if (currentUserId != userId) {
-            currentUserId = userId
-            loadCalorieGoal()
-        }
+    init {
+        loadCalorieGoal()
     }
+
+//    fun setUserId(userId: String) {
+//        if (currentUserId != userId) {
+//            currentUserId = userId
+//            loadCalorieGoal()
+//        }
+//    }
 
     fun loadCalorieGoal() {
         currentUserId?.let { userId ->

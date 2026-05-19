@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import com.example.fooddiary.data_old.models.ScannedFoodEntry
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import java.util.*
@@ -18,10 +19,16 @@ import java.util.*
 @Composable
 fun AddFoodScreen(
     onNavigateBack: () -> Unit,
-    onFoodAdded: () -> Unit
+    onFoodAdded: () -> Unit,
+
+    sharedViewModelStoreOwner: ViewModelStoreOwner,
+    viewModel: FoodViewModel = hiltViewModel(sharedViewModelStoreOwner)
+//    userId: String
 ) {
-//    val viewModel: FoodViewModel = viewModel()
-    val viewModel: FoodViewModel = hiltViewModel()
+
+//    LaunchedEffect(userId) {
+//        viewModel.setUserId(userId)
+//    }
 
     var foodName by remember { mutableStateOf("") }
     var calories by remember { mutableStateOf("") }
@@ -218,7 +225,7 @@ fun AddFoodScreen(
 
                     viewModel.addFoodEntry(foodEntry)
                     onFoodAdded()
-                    onNavigateBack()
+//                    onNavigateBack()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = foodName.isNotBlank() && !isLoading

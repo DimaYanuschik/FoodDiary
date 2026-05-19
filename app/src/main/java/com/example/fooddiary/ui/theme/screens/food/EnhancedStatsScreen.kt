@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddiary.ui.components.charts.*
 import com.example.fooddiary.ui.viewmodels.CalorieGoalViewModel
@@ -22,12 +23,11 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnhancedStatsScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    sharedViewModelStoreOwner: ViewModelStoreOwner,
 ) {
-//    val foodViewModel: FoodViewModel = viewModel()
-    val foodViewModel: FoodViewModel = hiltViewModel()
-
-    val calorieGoalViewModel: CalorieGoalViewModel = viewModel()
+    val foodViewModel: FoodViewModel = hiltViewModel(sharedViewModelStoreOwner)
+    val calorieGoalViewModel: CalorieGoalViewModel = hiltViewModel(sharedViewModelStoreOwner)
 
     val dailyStats by foodViewModel.dailyStats.collectAsState()
     val weeklyStats by foodViewModel.weeklyStats.collectAsState()
