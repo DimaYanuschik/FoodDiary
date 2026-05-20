@@ -24,18 +24,23 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddiary.data_old.auth.AuthRepository
 import com.example.fooddiary.data_old.models.BarcodeScanResult
+import com.example.fooddiary.data_old.repository.DailyStats
+import com.example.fooddiary.data_old.repository.FoodEntry
 import com.example.fooddiary.presentation.screens.home.HomeViewModel
+import com.example.fooddiary.ui.components.CalendarStrip
 import com.example.fooddiary.ui.screens.camera.CameraScreen
 import com.example.fooddiary.ui.screens.camera.GalleryPickerScreen
 import com.example.fooddiary.ui.screens.food.AddFoodScreen
 import com.example.fooddiary.ui.screens.barcode.BarcodeProductScreen
 import com.example.fooddiary.ui.screens.barcode.BarcodeScannerScreen
+import com.example.fooddiary.ui.screens.food.FoodItemCard
 import com.example.fooddiary.ui.screens.profile.CalorieGoalScreen
 import com.example.fooddiary.ui.screens.profile.UserProfileScreen
 import com.example.fooddiary.ui.screens.stats.EnhancedStatsScreen
 import com.example.fooddiary.ui.viewmodels.CalorieGoalViewModel
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -223,6 +228,11 @@ fun MainHomeScreen(
     val dailyStats by foodViewModel.dailyStats.collectAsState()
     val isLoading by foodViewModel.isLoading.collectAsState()
 
+    val selectedDate by foodViewModel.selectedDate.collectAsState()
+    var showFullCalendar by remember { mutableStateOf(false) }
+    val selectedDateEntries by foodViewModel.selectedDateEntries.collectAsState()
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -257,6 +267,13 @@ fun MainHomeScreen(
                 Icon(Icons.Filled.Settings, contentDescription = "Настройки")
             }
         }
+
+        CalendarStrip(
+            selectedDate = selectedDate,
+            onDateSelected = { date -> foodViewModel.selectDate(date) },
+            onCalendarClick = { showFullCalendar = true },
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+        )
 
         // Основной контент с прокруткой
         Column(
@@ -343,7 +360,11 @@ fun MainHomeScreen(
 
             FoodListSection(
                 onAddFoodClick = onOpenAddFood,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                entries = selectedDateEntries,
+                stats = dailyStats,
+                isLoading = isLoading,
+                onDelete = { id -> foodViewModel.deleteFoodEntry(id) }
             )
         }
 
@@ -357,12 +378,56 @@ fun MainHomeScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         )
     }
+
+    if (showFullCalendar) {
+        FullCalendarDialog(
+            currentDate = selectedDate,
+            onDateSelected = { date ->
+                foodViewModel.selectDate(date)
+                showFullCalendar = false
+            },
+            onDismiss = { showFullCalendar = false }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FullCalendarDialog(
+    currentDate: Date,
+    onDateSelected: (Date) -> Unit,
+    onDismiss: () -> Unit
+) {
+    // Простейшая реализация: используем DatePickerDialog из Material3
+    // Но можно сделать свой календарь на целый месяц.
+    // Воспользуемся DatePickerDialog, требующим Android DatePicker.
+    // Для Compose используем DatePickerDialog из compose-material3
+    // или AndroidView.
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = currentDate.time)
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                datePickerState.selectedDateMillis?.let { millis ->
+                    onDateSelected(Date(millis))
+                } ?: onDismiss()
+            }) { Text("OK") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Отмена") } }
+    ) {
+        DatePicker(state = datePickerState)
+    }
 }
 
 @Composable
 private fun FoodListSection(
     onAddFoodClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+
+    entries: List<FoodEntry>,
+    stats: DailyStats,
+    isLoading: Boolean,
+    onDelete: (String) -> Unit
 ) {
     Card(
         modifier = modifier,
@@ -376,24 +441,175 @@ private fun FoodListSection(
                 .fillMaxWidth()
                 .heightIn(min = 200.dp, max = 400.dp)
         ) {
-            // Внутренняя прокрутка для списка еды
-            FoodListScreenWithScroll(
+//            // Внутренняя прокрутка для списка еды
+//            FoodListScreenWithScroll(
+//                onAddFoodClick = onAddFoodClick,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .weight(1f)
+//                    .padding(16.dp)
+//            )
+            FoodListContent(
+                entries = entries,
+                stats = stats,
+                isLoading = isLoading,
                 onAddFoodClick = onAddFoodClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(16.dp)
+                onDelete = onDelete
             )
         }
     }
 }
 
 @Composable
+fun FoodListContent(
+    entries: List<FoodEntry>,
+    stats: DailyStats,
+    isLoading: Boolean,
+    onAddFoodClick: () -> Unit,
+    onDelete: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+//    val viewModel: FoodViewModel = hiltViewModel()
+//    val todayFoodEntries by viewModel.todayFoodEntries.collectAsState()
+//    val dailyStats by viewModel.dailyStats.collectAsState()
+//    val isLoading by viewModel.isLoading.collectAsState()
+
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState())
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Сегодняшние приемы пищи",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            IconButton(
+                onClick = onAddFoodClick,
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = "Добавить")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Статистика за день
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = "Всего за день",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                    Text(
+                        text = "${stats.totalCalories} ккал",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = "БЖУ",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                    Text(
+                        text = "${String.format("%.1f", stats.totalProtein)} / " +
+                                "${String.format("%.1f", stats.totalFat)} / " +
+                                "${String.format("%.1f", stats.totalCarbs)} г",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (entries.isEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onAddFoodClick
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Filled.Restaurant,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Добавьте первый прием пищи",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Text(
+                        text = "Нажмите чтобы добавить",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        } else {
+            // Список еды по приемам пищи
+            val meals = entries.groupBy { it.mealType }
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                meals.forEach { (mealType, entries) ->
+                    Text(
+                        text = mealType,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+
+                    entries.forEach { food ->
+                        FoodItemCard(
+                            food = food,
+                            onDelete = { onDelete(food.id) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Версия до календаря
+@Composable
 fun FoodListScreenWithScroll(
     onAddFoodClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-//    val viewModel: FoodViewModel = viewModel()
     val viewModel: FoodViewModel = hiltViewModel()
     val todayFoodEntries by viewModel.todayFoodEntries.collectAsState()
     val dailyStats by viewModel.dailyStats.collectAsState()

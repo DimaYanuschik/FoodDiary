@@ -46,7 +46,7 @@ class FoodRepository @Inject constructor() {
         val foodData = food.copy(
             id = foodWithId.id,
             userId = userId,
-            date = Date()
+//            date = Date()
         )
 
         foodWithId.set(foodData).await()
@@ -133,6 +133,18 @@ class FoodRepository @Inject constructor() {
         }
 
         return stats.reversed()
+    }
+
+    // Для произвольной недели
+    suspend fun getDailyStatsForWeek(userId: String, weekStart: Date): List<DailyStats> {
+        val calendar = Calendar.getInstance().apply { time = weekStart }
+        val stats = mutableListOf<DailyStats>()
+        repeat(7) {
+            val date = calendar.time
+            stats.add(getDailyStats(userId, date))
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+        return stats
     }
 
     suspend fun testQueries(userId: String) {

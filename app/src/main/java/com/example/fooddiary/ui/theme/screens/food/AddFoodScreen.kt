@@ -41,6 +41,7 @@ fun AddFoodScreen(
     var isExpanded by remember { mutableStateOf(false) }
 
     val isLoading by viewModel.isLoading.collectAsState()
+    val selectedDate by viewModel.selectedDate.collectAsState()
 
     Scaffold(
         topBar = {
@@ -214,7 +215,8 @@ fun AddFoodScreen(
                         protein = protein.toDoubleOrNull() ?: 0.0,
                         fat = fat.toDoubleOrNull() ?: 0.0,
                         carbs = carbs.toDoubleOrNull() ?: 0.0,
-                        date = Date(),
+//                        date = Date(),
+                        date = selectedDate,
                         mealType = mealType,
                         //Костыль
                         notes = "",
