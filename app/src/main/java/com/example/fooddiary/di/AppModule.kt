@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.fooddiary.data_old.api.ApiClient
 import com.example.fooddiary.data_old.database.BarcodeDatabase
 import com.example.fooddiary.data_old.repository.BarcodeRepository
+import com.example.fooddiary.data_old.repository.UserProfileRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -17,6 +18,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun provideUserProfileRepository(): UserProfileRepository {
+        return UserProfileRepository()
+    }
 
     @Provides
     @Singleton

@@ -27,16 +27,10 @@ import com.example.fooddiary.data_old.models.BarcodeScanResult
 import com.example.fooddiary.data_old.repository.DailyStats
 import com.example.fooddiary.data_old.repository.FoodEntry
 import com.example.fooddiary.presentation.screens.home.HomeViewModel
+import com.example.fooddiary.presentation.screens.water.WaterViewModel
 import com.example.fooddiary.ui.components.CalendarStrip
-import com.example.fooddiary.ui.screens.camera.CameraScreen
-import com.example.fooddiary.ui.screens.camera.GalleryPickerScreen
-import com.example.fooddiary.ui.screens.food.AddFoodScreen
-import com.example.fooddiary.ui.screens.barcode.BarcodeProductScreen
-import com.example.fooddiary.ui.screens.barcode.BarcodeScannerScreen
+import com.example.fooddiary.ui.components.WaterTrackerCard
 import com.example.fooddiary.ui.screens.food.FoodItemCard
-import com.example.fooddiary.ui.screens.profile.CalorieGoalScreen
-import com.example.fooddiary.ui.screens.profile.UserProfileScreen
-import com.example.fooddiary.ui.screens.stats.EnhancedStatsScreen
 import com.example.fooddiary.ui.viewmodels.CalorieGoalViewModel
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
@@ -215,6 +209,11 @@ fun MainHomeScreen(
     val userProfileViewModel: UserProfileViewModel = hiltViewModel()
     val calorieGoalViewModel: CalorieGoalViewModel = hiltViewModel()
 
+    val waterViewModel: WaterViewModel = hiltViewModel()
+    val waterUiState by waterViewModel.uiState.collectAsState() // TODO: возможно лучше вынести в WaterTrackerCard
+
+
+
 //    LaunchedEffect(userId) {
 //        if (userId.isNotEmpty()) {
 //            foodViewModel.setUserId(userId)
@@ -231,6 +230,12 @@ fun MainHomeScreen(
     val selectedDate by foodViewModel.selectedDate.collectAsState()
     var showFullCalendar by remember { mutableStateOf(false) }
     val selectedDateEntries by foodViewModel.selectedDateEntries.collectAsState()
+
+
+    // Для синхронизации даты с модулем Water
+    LaunchedEffect(selectedDate) {
+        waterViewModel.loadForDate(selectedDate)
+    }
 
 
     Column(
@@ -355,6 +360,14 @@ fun MainHomeScreen(
                 dailyStats = dailyStats,
                 calorieGoal = calorieGoal,
                 onSettingsClick = onOpenGoals,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            WaterTrackerCard(
+                uiState = waterUiState,
+                onAddWater = { amount -> waterViewModel.addWater(amount) },
+                onDeleteEntry = { id -> waterViewModel.deleteEntry(id) },
+                onSetGoal = { goal -> waterViewModel.setGoal(goal) },
                 modifier = Modifier.fillMaxWidth()
             )
 

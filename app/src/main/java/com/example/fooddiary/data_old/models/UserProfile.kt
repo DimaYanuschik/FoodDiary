@@ -13,7 +13,9 @@ data class UserProfile(
     val activityLevel: ActivityLevel = ActivityLevel.MODERATE,
     val goal: Goal = Goal.MAINTAIN,
     val createdAt: Date = Date(),
-    val updatedAt: Date = Date()
+    val updatedAt: Date = Date(),
+
+    val waterGoalMl: Int = 0
 ) {
     val age: Int
         get() {
