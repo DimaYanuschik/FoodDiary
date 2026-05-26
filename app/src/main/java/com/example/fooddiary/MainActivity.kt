@@ -1,7 +1,12 @@
 // MainActivity.kt - исправленная версия
 package com.example.fooddiary
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -20,6 +26,7 @@ import com.example.fooddiary.data_old.repository.UserProfileRepository
 import com.example.fooddiary.presentation.screens.auth.AuthViewModel
 import com.example.fooddiary.presentation.screens.auth.LoginScreen
 import com.example.fooddiary.presentation.screens.auth.RegisterScreen
+import com.example.fooddiary.presentation.screens.foodrecognition.FoodRecognitionScreen
 import com.example.fooddiary.presentation.screens.search.SearchScreen
 import com.example.fooddiary.ui.screens.barcode.BarcodeProductScreen
 import com.example.fooddiary.ui.screens.barcode.BarcodeScannerScreen
@@ -34,6 +41,7 @@ import com.example.fooddiary.ui.theme.FoodDiaryTheme
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
+import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -50,6 +58,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+private fun uriToBitmap(uri: Uri, context: Context): Bitmap {
+    return MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
 }
 
 @Composable
@@ -163,7 +175,8 @@ fun MainNavigation() {
                     }
                 },
                 onNavigateToCamera = { navController.navigate("camera") },
-                onNavigateToGallery = { navController.navigate("gallery")},
+//                onNavigateToGallery = { navController.navigate("gallery")},
+                onNavigateToGallery = { navController.navigate("gallery_recognition")},
                 onNavigateToAddFood = { navController.navigate("add_food")},
                 onNavigateToStats = { navController.navigate("stats") },
                 onNavigateToProfile = { navController.navigate("profile") },
@@ -192,6 +205,30 @@ fun MainNavigation() {
                 onImageSelected = { uri ->
                     navController.navigate("add_food?photoUri=${uri}") {
                         popUpTo("gallery") { inclusive = true }
+                    }
+                },
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("gallery_recognition") {
+            val context = LocalContext.current
+            GalleryPickerScreen(
+                onImageSelected = { uri ->
+                    // Конвертируем URI → Bitmap → сохраняем во временный файл
+                    val bitmap = uriToBitmap(uri, context)
+                    val tempFile = File(context.cacheDir, "food_${System.currentTimeMillis()}.jpg")
+                    tempFile.outputStream().use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+                    }
+                    // Переходим на экран распознавания
+//                    val filePath = tempFile.absolutePath.removePrefix("/")
+//                    navController.navigate("food_recognition/$filePath") {
+//                        popUpTo("gallery_recognition") { inclusive = true }
+//                    }
+                    val encodedPath = Uri.encode(tempFile.absolutePath)
+                    navController.navigate("food_recognition/$encodedPath") {
+                        popUpTo("gallery_recognition") { inclusive = true }
                     }
                 },
                 onNavigateBack = { navController.popBackStack() }
@@ -283,6 +320,28 @@ fun MainNavigation() {
                     navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("food_recognition/{imagePath}",
+            arguments = listOf(navArgument("imagePath") { type = NavType.StringType })
+        ) { backStackEntry ->
+//            val imagePath = "/" + (backStackEntry.arguments?.getString("imagePath") ?: "")
+//
+//            val bitmap = remember(imagePath) {
+//                BitmapFactory.decodeFile(imagePath)
+//            }
+            val encodedPath = backStackEntry.arguments?.getString("imagePath") ?: ""
+            val imagePath = Uri.decode(encodedPath)
+            val bitmap = remember(imagePath) {
+                BitmapFactory.decodeFile(imagePath)
+            }
+            val homeEntry = navController.getBackStackEntry("home")
+            FoodRecognitionScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onFoodAdded = { navController.popBackStack() },
+                selectedImageBitmap = bitmap,
+                sharedViewModelStoreOwner = homeEntry
             )
         }
     }

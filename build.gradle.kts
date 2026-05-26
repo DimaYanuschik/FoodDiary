@@ -14,3 +14,16 @@ plugins {
 //    alias(libs.plugins.firebase.crashlytics) apply false
 //    alias(libs.plugins.firebase.perf) apply false
 }
+
+allprojects {
+    afterEvaluate {
+        val localProperties = java.util.Properties()
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localProperties.load(localFile.inputStream())
+            localProperties.forEach { key, value ->
+                project.ext.set(key.toString(), value.toString())
+            }
+        }
+    }
+}
