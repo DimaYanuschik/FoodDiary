@@ -303,11 +303,15 @@ fun MainNavigation() {
         ) { backStackEntry ->
             val barcode = backStackEntry.arguments?.getString("barcode") ?: ""
             // Создаём BarcodeScanResult с barcode, сам продукт будет загружен внутри экрана
-            val scanResult = BarcodeScanResult(barcode = barcode)
+//            val scanResult = BarcodeScanResult(barcode = barcode)
+            val homeEntry = navController.getBackStackEntry("home")
+
             BarcodeProductScreen(
-                scanResult = scanResult,
+//                scanResult = scanResult,
+                barcode = barcode,
                 onAddToDiary = { navController.popBackStack() },
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                sharedViewModelStoreOwner = homeEntry
             )
         }
 

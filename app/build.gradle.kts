@@ -79,7 +79,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
 
     // CameraX (ИСПРАВЛЕННЫЕ ВЕРСИИ)
-    val cameraxVersion = "1.3.2"  // Более стабильная версия
+//    val cameraxVersion = "1.3.2"  // Более стабильная версия
+    val cameraxVersion = "1.4.1"  // Более стабильная версия
     implementation("androidx.camera:camera-core:${cameraxVersion}")
     implementation("androidx.camera:camera-camera2:${cameraxVersion}")
     implementation("androidx.camera:camera-lifecycle:${cameraxVersion}")
@@ -102,7 +103,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // ML Kit для сканирования штрихкодов
-    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+//    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
     // Room для локальной базы
     implementation("androidx.room:room-runtime:2.6.0")

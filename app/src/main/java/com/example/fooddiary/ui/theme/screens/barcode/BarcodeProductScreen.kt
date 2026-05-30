@@ -16,10 +16,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.fooddiary.data_old.models.BarcodeScanResult
 import com.example.fooddiary.data_old.models.ScannedFoodEntry
+import com.example.fooddiary.ui.viewmodels.BarcodeScanState
 import com.example.fooddiary.ui.viewmodels.BarcodeViewModel
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import java.util.*
@@ -27,24 +29,49 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BarcodeProductScreen(
-    scanResult: BarcodeScanResult,
+//    scanResult: BarcodeScanResult,
+    barcode: String,
     onAddToDiary: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    sharedViewModelStoreOwner: ViewModelStoreOwner? = null
 ) {
     val barcodeViewModel: BarcodeViewModel = hiltViewModel()
-    val foodViewModel: FoodViewModel = hiltViewModel()
-
-    val product = scanResult.product
-
-    if (product == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Информация о продукте отсутствует")
-            Button(onClick = onNavigateBack, modifier = Modifier.padding(top = 16.dp)) {
-                Text("Назад")
-            }
-        }
-        return
+//    val foodViewModel: FoodViewModel = hiltViewModel()
+// Используем общую FoodViewModel, если она передана
+    val foodViewModel: FoodViewModel = if (sharedViewModelStoreOwner != null) {
+        hiltViewModel(sharedViewModelStoreOwner)
+    } else {
+        hiltViewModel()
     }
+
+//    // Загружаем продукт при старте
+//    LaunchedEffect(barcode) {
+//        barcodeViewModel.scanBarcodeFromBitmap(null) // сбросим состояние
+//        // BarcodeViewModel умеет загружать продукт по штрихкоду?
+//        // У нас есть fetchProductInfo, но он требует barcode и возвращает результат сразу.
+//        // В ViewModel нет готового метода для загрузки по штрихкоду без bitmap.
+//        // Придётся вызвать barcodeRepository.fetchProductInfo напрямую?
+//        // Лучше добавить в BarcodeViewModel метод loadProductByBarcode(barcode)
+//    }
+
+    LaunchedEffect(barcode) {
+        barcodeViewModel.fetchProductByBarcode(barcode)
+    }
+
+    val uiState by barcodeViewModel.uiState.collectAsState()
+    val product = (uiState.scanState as? BarcodeScanState.ProductFound)?.result?.product
+
+//    val product = scanResult.product
+
+//    if (product == null) {
+//        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//            Text("Информация о продукте отсутствует")
+//            Button(onClick = onNavigateBack, modifier = Modifier.padding(top = 16.dp)) {
+//                Text("Назад")
+//            }
+//        }
+//        return
+//    }
 
     // State для ввода данных
     var servingSize by remember { mutableStateOf("100") }
@@ -58,6 +85,23 @@ fun BarcodeProductScreen(
     // Коэффициент пересчета
     // Если servingSize = 100г и quantity = 1, то factor = 1.0
     val factor = (servingSizeValue / 100.0) * quantityValue
+
+    if (uiState.scanState is BarcodeScanState.FetchingProduct || product == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+    if (uiState.scanState is BarcodeScanState.Error) {
+        val errorMessage = (uiState.scanState as BarcodeScanState.Error).message
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Ошибка: $errorMessage")
+                Button(onClick = onNavigateBack) { Text("Назад") }
+            }
+        }
+        return
+    }
 
     Scaffold(
         topBar = {
@@ -164,7 +208,8 @@ fun BarcodeProductScreen(
                         protein = product.protein * factor,
                         fat = product.fat * factor,
                         carbs = product.carbs * factor,
-                        date = Date(),
+//                        date = Date(),
+                        date = foodViewModel.selectedDate.value,
                         barcode = product.barcode,
                         originalProduct = product,
                         source = "scanner"

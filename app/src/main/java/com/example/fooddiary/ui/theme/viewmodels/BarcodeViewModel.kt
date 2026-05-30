@@ -123,6 +123,30 @@ class BarcodeViewModel @Inject constructor(
         }
     }
 
+    fun fetchProductByBarcode(barcode: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(scanState = BarcodeScanState.FetchingProduct(barcode)) }
+            val result = barcodeRepository.fetchProductInfo(barcode)
+            if (result.product != null) {
+                _uiState.update {
+                    it.copy(
+                        scanState = BarcodeScanState.ProductFound(result),
+                        lastScanResult = result,
+                        errorMessage = null
+                    )
+                }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        scanState = BarcodeScanState.Error(result.error ?: "Не найден"),
+                        lastScanResult = result,
+                        errorMessage = result.error
+                    )
+                }
+            }
+        }
+    }
+
     fun clearError() {
         _uiState.update {
             it.copy(
