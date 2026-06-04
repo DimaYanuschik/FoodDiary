@@ -20,7 +20,7 @@ import androidx.room.util.query
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen (
-    onProductClick: (String) -> Unit,
+    onProductSelected: (com.example.fooddiary.domain.model.product.Product) -> Unit,
     onBack: () -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
@@ -119,7 +119,8 @@ fun SearchScreen (
                             Text("${product.caloriesPer100g.toInt()} ккал")
                         },
                         modifier = Modifier.clickable {
-                            onProductClick(product.id)
+//                            onProductClick(product.id)
+                            onProductSelected(product)
 
                         }
                     )

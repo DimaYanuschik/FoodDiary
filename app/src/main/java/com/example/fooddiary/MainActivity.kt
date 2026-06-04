@@ -38,6 +38,7 @@ import com.example.fooddiary.ui.screens.profile.CalorieGoalScreen
 import com.example.fooddiary.ui.screens.profile.UserProfileScreen
 import com.example.fooddiary.ui.screens.stats.EnhancedStatsScreen
 import com.example.fooddiary.ui.theme.FoodDiaryTheme
+import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
@@ -317,11 +318,20 @@ fun MainNavigation() {
 
         // Экран поиска продуктов
         composable("search") {
+            val homeEntry = navController.getBackStackEntry("home")
+            val foodViewModel: FoodViewModel = hiltViewModel(homeEntry)
+
             SearchScreen(
-                onProductClick = { productId ->
-                    // Действие при клике на продукт: например, добавить в дневник или показать детали
-                    // Пока просто возвращаемся назад, позже можно расширить
-                    navController.popBackStack()
+//                onProductClick = { productId ->
+//                    // Действие при клике на продукт: например, добавить в дневник или показать детали
+//                    // Пока просто возвращаемся назад, позже можно расширить
+//                    navController.popBackStack()
+//                },
+                onProductSelected = { product ->
+                    foodViewModel.setProductFromSearch(product)
+                    navController.navigate("add_food") {
+                        popUpTo("search") { inclusive = true }
+                    }
                 },
                 onBack = { navController.popBackStack() }
             )

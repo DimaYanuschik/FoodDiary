@@ -269,4 +269,17 @@ class FoodViewModel @Inject constructor(
     fun getWeeklyDataForChart(): List<Pair<Date, Int>> {
         return _weeklyStats.value.map { it.date to it.totalCalories }
     }
+
+
+    // Продукт, выбранный из поиска для быстрого добавления
+    private val _selectedSearchProduct = MutableStateFlow<com.example.fooddiary.domain.model.product.Product?>(null)
+    val selectedSearchProduct: StateFlow<com.example.fooddiary.domain.model.product.Product?> = _selectedSearchProduct.asStateFlow()
+
+    fun setProductFromSearch(product: com.example.fooddiary.domain.model.product.Product) {
+        _selectedSearchProduct.value = product
+    }
+
+    fun clearSearchProduct() {
+        _selectedSearchProduct.value = null
+    }
 }
