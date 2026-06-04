@@ -1,12 +1,12 @@
 package com.example.fooddiary.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,6 +24,7 @@ fun WaterTrackerCard(
     onSetGoal: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var expanded by remember { mutableStateOf(false) }
     var showAddDialog by remember { mutableStateOf(false) }
     var showGoalDialog by remember { mutableStateOf(false) }
 
@@ -32,42 +33,72 @@ fun WaterTrackerCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column {
+            // Заголовок — кликабельная строка на всю ширину, как в дневнике питания
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded }
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Вода", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                Row {
-                    IconButton(onClick = { showGoalDialog = true }) {
-                        Icon(Icons.Filled.Tune, contentDescription = "Настроить цель")
-                    }
-                    IconButton(onClick = { showAddDialog = true }) {
-                        Icon(Icons.Filled.Add, contentDescription = "Добавить воду")
-                    }
+                Icon(
+                    imageVector = Icons.Filled.WaterDrop,
+                    contentDescription = "Вода",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    "Вода",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = { showGoalDialog = true }) {
+                    Icon(Icons.Filled.Tune, contentDescription = "Настроить цель")
                 }
+                IconButton(onClick = { showAddDialog = true }) {
+                    Icon(Icons.Filled.Add, contentDescription = "Добавить воду")
+                }
+                Icon(
+                    imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                    contentDescription = if (expanded) "Свернуть" else "Развернуть"
+                )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // Прогресс-бар и сводка (видны всегда)
             val progress = if (uiState.goalMl > 0) (uiState.totalMl.toFloat() / uiState.goalMl).coerceIn(0f, 1f) else 0f
-            LinearProgressIndicator(progress = progress, modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(4.dp))
-            Text("${uiState.totalMl} / ${uiState.goalMl} мл", style = MaterialTheme.typography.bodyMedium)
+            LinearProgressIndicator(progress = progress, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "${uiState.totalMl} / ${uiState.goalMl} мл",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
 
-            if (uiState.entries.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                uiState.entries.takeLast(3).reversed().forEach { entry ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+            // Разворачиваемый список всех записей
+            AnimatedVisibility(visible = expanded) {
+                if (uiState.entries.isNotEmpty()) {
+                    Spacer(Modifier.height(8.dp))
+                    Column(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text("${entry.amountMl} мл")
-                        IconButton(onClick = { onDeleteEntry(entry.id) }) {
-                            Icon(Icons.Filled.Delete, contentDescription = "Удалить", tint = MaterialTheme.colorScheme.error)
+                        uiState.entries.reversed().forEach { entry ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("${entry.amountMl} мл")
+                                IconButton(onClick = { onDeleteEntry(entry.id) }) {
+                                    Icon(Icons.Filled.Delete, contentDescription = "Удалить", tint = MaterialTheme.colorScheme.error)
+                                }
+                            }
                         }
                     }
+                    Spacer(Modifier.height(8.dp))
                 }
             }
         }

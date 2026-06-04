@@ -1,5 +1,6 @@
 package com.example.fooddiary.ui.screens.main
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,9 @@ import com.example.fooddiary.ui.screens.food.FoodItemCard
 import com.example.fooddiary.ui.viewmodels.CalorieGoalViewModel
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +58,7 @@ fun HomeScreen(
     val isLoadingUser by homeViewModel.isLoading.collectAsStateWithLifecycle()
 
 //  Старая навигация с флагами
+
 //    var showCameraScreen by remember { mutableStateOf(false) }
 //    var showGalleryScreen by remember { mutableStateOf(false) }
 //    var showAddFoodScreen by remember { mutableStateOf(false) }
@@ -205,6 +210,7 @@ fun MainHomeScreen(
     onOpenBarcodeScanner: () -> Unit,
     onOpenSearch: () -> Unit
 ) {
+
     val foodViewModel: FoodViewModel = hiltViewModel()
     val userProfileViewModel: UserProfileViewModel = hiltViewModel()
     val calorieGoalViewModel: CalorieGoalViewModel = hiltViewModel()
@@ -363,14 +369,6 @@ fun MainHomeScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            WaterTrackerCard(
-                uiState = waterUiState,
-                onAddWater = { amount -> waterViewModel.addWater(amount) },
-                onDeleteEntry = { id -> waterViewModel.deleteEntry(id) },
-                onSetGoal = { goal -> waterViewModel.setGoal(goal) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
             FoodListSection(
                 onAddFoodClick = onOpenAddFood,
                 modifier = Modifier.fillMaxWidth(),
@@ -378,6 +376,14 @@ fun MainHomeScreen(
                 stats = dailyStats,
                 isLoading = isLoading,
                 onDelete = { id -> foodViewModel.deleteFoodEntry(id) }
+            )
+
+            WaterTrackerCard(
+                uiState = waterUiState,
+                onAddWater = { amount -> waterViewModel.addWater(amount) },
+                onDeleteEntry = { id -> waterViewModel.deleteEntry(id) },
+                onSetGoal = { goal -> waterViewModel.setGoal(goal) },
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -452,7 +458,6 @@ private fun FoodListSection(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 200.dp, max = 400.dp)
         ) {
 //            // Внутренняя прокрутка для списка еды
 //            FoodListScreenWithScroll(
@@ -473,6 +478,150 @@ private fun FoodListSection(
     }
 }
 
+//@Composable
+//fun FoodListContent(
+//    entries: List<FoodEntry>,
+//    stats: DailyStats,
+//    isLoading: Boolean,
+//    onAddFoodClick: () -> Unit,
+//    onDelete: (String) -> Unit,
+//    modifier: Modifier = Modifier
+//) {
+////    val viewModel: FoodViewModel = hiltViewModel()
+////    val todayFoodEntries by viewModel.todayFoodEntries.collectAsState()
+////    val dailyStats by viewModel.dailyStats.collectAsState()
+////    val isLoading by viewModel.isLoading.collectAsState()
+//
+//    Column(
+//        modifier = modifier.verticalScroll(rememberScrollState())
+//    ) {
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Text(
+//                text = "Сегодняшние приемы пищи",
+//                style = MaterialTheme.typography.titleMedium
+//            )
+//
+//            IconButton(
+//                onClick = onAddFoodClick,
+//                modifier = Modifier.size(36.dp)
+//            ) {
+//                Icon(Icons.Filled.Add, contentDescription = "Добавить")
+//            }
+//        }
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        // Статистика за день
+//        Card(
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(12.dp),
+//                horizontalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                Column {
+//                    Text(
+//                        text = "Всего за день",
+//                        style = MaterialTheme.typography.labelMedium
+//                    )
+//                    Text(
+//                        text = "${stats.totalCalories} ккал",
+//                        style = MaterialTheme.typography.titleLarge,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                }
+//
+//                Column(
+//                    horizontalAlignment = Alignment.End
+//                ) {
+//                    Text(
+//                        text = "БЖУ",
+//                        style = MaterialTheme.typography.labelMedium
+//                    )
+//                    Text(
+//                        text = "${String.format("%.1f", stats.totalProtein)} / " +
+//                                "${String.format("%.1f", stats.totalFat)} / " +
+//                                "${String.format("%.1f", stats.totalCarbs)} г",
+//                        style = MaterialTheme.typography.bodySmall
+//                    )
+//                }
+//            }
+//        }
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        if (isLoading) {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(100.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                CircularProgressIndicator()
+//            }
+//        } else if (entries.isEmpty()) {
+//            Card(
+//                modifier = Modifier.fillMaxWidth(),
+//                onClick = onAddFoodClick
+//            ) {
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(24.dp),
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    Icon(
+//                        Icons.Filled.Restaurant,
+//                        contentDescription = null,
+//                        modifier = Modifier.size(48.dp)
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(16.dp))
+//
+//                    Text(
+//                        text = "Добавьте первый прием пищи",
+//                        style = MaterialTheme.typography.bodyLarge
+//                    )
+//
+//                    Text(
+//                        text = "Нажмите чтобы добавить",
+//                        style = MaterialTheme.typography.bodySmall
+//                    )
+//                }
+//            }
+//        } else {
+//            // Список еды по приемам пищи
+//            val meals = entries.groupBy { it.mealType }
+//
+//            Column(
+//                verticalArrangement = Arrangement.spacedBy(12.dp)
+//            ) {
+//                meals.forEach { (mealType, entries) ->
+//                    Text(
+//                        text = mealType,
+//                        style = MaterialTheme.typography.titleSmall,
+//                        color = MaterialTheme.colorScheme.primary,
+//                        modifier = Modifier.padding(horizontal = 8.dp)
+//                    )
+//
+//                    entries.forEach { food ->
+//                        FoodItemCard(
+//                            food = food,
+//                            onDelete = { onDelete(food.id) }
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
+
 @Composable
 fun FoodListContent(
     entries: List<FoodEntry>,
@@ -480,138 +629,123 @@ fun FoodListContent(
     isLoading: Boolean,
     onAddFoodClick: () -> Unit,
     onDelete: (String) -> Unit,
+    newlyAddedMealType: String? = null,   // <-- новый параметр
     modifier: Modifier = Modifier
 ) {
-//    val viewModel: FoodViewModel = hiltViewModel()
-//    val todayFoodEntries by viewModel.todayFoodEntries.collectAsState()
-//    val dailyStats by viewModel.dailyStats.collectAsState()
-//    val isLoading by viewModel.isLoading.collectAsState()
+    val expandedMealTypes = remember { mutableStateMapOf<String, Boolean>() }
 
-    Column(
-        modifier = modifier.verticalScroll(rememberScrollState())
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Сегодняшние приемы пищи",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            IconButton(
-                onClick = onAddFoodClick,
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Добавить")
-            }
+    // Автоматически раскрываем категорию, в которую только что добавили продукт
+    LaunchedEffect(newlyAddedMealType) {
+        if (newlyAddedMealType != null) {
+            expandedMealTypes.keys.forEach { key -> expandedMealTypes[key] = false }
+            expandedMealTypes[newlyAddedMealType] = true
         }
+    }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Статистика за день
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = "Всего за день",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Text(
-                        text = "${stats.totalCalories} ккал",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = "БЖУ",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Text(
-                        text = "${String.format("%.1f", stats.totalProtein)} / " +
-                                "${String.format("%.1f", stats.totalFat)} / " +
-                                "${String.format("%.1f", stats.totalCarbs)} г",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
+    Column(modifier = modifier) {
         if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(Modifier.fillMaxWidth().height(100.dp), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         } else if (entries.isEmpty()) {
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onAddFoodClick
+                onClick = onAddFoodClick,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        Icons.Filled.Restaurant,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = "Добавьте первый прием пищи",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Text(
-                        text = "Нажмите чтобы добавить",
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                Column(Modifier.fillMaxWidth().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Filled.Restaurant, contentDescription = null, modifier = Modifier.size(48.dp))
+                    Spacer(Modifier.height(16.dp))
+                    Text("Добавьте первый приём пищи")
+                    Text("Нажмите, чтобы добавить", style = MaterialTheme.typography.bodySmall)
                 }
             }
         } else {
-            // Список еды по приемам пищи
             val meals = entries.groupBy { it.mealType }
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                meals.forEach { (mealType, entries) ->
-                    Text(
-                        text = mealType,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
+//            // Состояния для каждой категории (по умолчанию все закрыты)
+//            val expandedMealTypes = remember { mutableStateMapOf<String, Boolean>() }
 
-                    entries.forEach { food ->
-                        FoodItemCard(
-                            food = food,
-                            onDelete = { onDelete(food.id) }
+            meals.forEach { (mealType, mealEntries) ->
+                val isExpanded = expandedMealTypes.getOrPut(mealType) { false }
+
+                // Суммарные показатели для этой категории
+                val catCalories = mealEntries.sumOf { it.calories }
+                val catProtein = mealEntries.sumOf { it.protein }
+                val catFat = mealEntries.sumOf { it.fat }
+                val catCarbs = mealEntries.sumOf { it.carbs }
+
+                // Иконка приёма пищи
+                val icon = when (mealType) {
+                    "Завтрак" -> Icons.Filled.FreeBreakfast
+                    "Обед" -> Icons.Filled.LunchDining
+                    "Ужин" -> Icons.Filled.DinnerDining
+                    else -> Icons.Filled.Cookie   // для "Перекус" и всего остального
+                }
+
+                // Заголовок категории с кнопкой сворачивания
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expandedMealTypes[mealType] = !isExpanded },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (isExpanded)
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        else
+                            MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = mealType,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                text = "$mealType (${mealEntries.size})",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.height(2.dp))
+//                            Row(verticalAlignment = Alignment.CenterVertically) {
+//                                Icon(
+//                                    imageVector = Icons.Filled.LocalFireDepartment,
+//                                    contentDescription = "Калории",
+//                                    modifier = Modifier.size(16.dp),
+//                                    tint = MaterialTheme.colorScheme.primary
+//                                )
+//                            }
+                            Text(
+                                text = "$catCalories ккал  •  Б: ${String.format("%.1f", catProtein)}  Ж: ${String.format("%.1f",catFat)}  У: ${String.format("%.1f", catCarbs)} г",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Icon(
+                            imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                            contentDescription = if (isExpanded) "Свернуть" else "Развернуть"
                         )
                     }
                 }
+
+                // Содержимое категории
+                AnimatedVisibility(visible = isExpanded) {
+                    Column(
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        mealEntries.forEach { food ->
+                            FoodItemCard(food = food, onDelete = { onDelete(food.id) })
+                        }
+                    }
+                }
+                Spacer(Modifier.height(6.dp))
             }
         }
     }
