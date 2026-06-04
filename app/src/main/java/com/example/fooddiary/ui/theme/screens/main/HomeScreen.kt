@@ -38,6 +38,7 @@ import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.BoxScope
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -219,7 +220,6 @@ fun MainHomeScreen(
     val waterUiState by waterViewModel.uiState.collectAsState() // TODO: возможно лучше вынести в WaterTrackerCard
 
 
-
 //    LaunchedEffect(userId) {
 //        if (userId.isNotEmpty()) {
 //            foodViewModel.setUserId(userId)
@@ -243,6 +243,8 @@ fun MainHomeScreen(
         waterViewModel.loadForDate(selectedDate)
     }
 
+    // Состояние для шторки
+    var showAddSheet by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -303,63 +305,63 @@ fun MainHomeScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            // Кнопки действий в сетке
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    HomeActionButton(
-                        icon = Icons.Filled.Camera,
-                        text = "Сфотографировать",
-                        onClick = onOpenCamera,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    HomeActionButton(
-                        icon = Icons.Filled.PhotoLibrary,
-                        text = "Из галереи",
-                        onClick = onOpenGallery,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    HomeActionButton(
-                        icon = Icons.Filled.QrCodeScanner,
-                        text = "Сканировать штрихкод",
-                        onClick = onOpenBarcodeScanner,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    HomeActionButton(
-                        icon = Icons.Filled.Add,
-                        text = "Добавить вручную",
-                        onClick = onOpenAddFood,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    HomeActionButton(
-                        icon = Icons.Filled.BarChart,
-                        text = "Статистика",
-                        onClick = {
-                            foodViewModel.refreshData()
-                            onOpenStats()
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    HomeActionButton(
-                        icon = Icons.Filled.Search,
-                        text = "Поиск",
-                        onClick = onOpenSearch,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
+//            // Кнопки действий в сетке
+//            Column(
+//                verticalArrangement = Arrangement.spacedBy(12.dp)
+//            ) {
+//                Row(
+//                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+//                ) {
+//                    HomeActionButton(
+//                        icon = Icons.Filled.Camera,
+//                        text = "Сфотографировать",
+//                        onClick = onOpenCamera,
+//                        modifier = Modifier.weight(1f)
+//                    )
+//
+//                    HomeActionButton(
+//                        icon = Icons.Filled.PhotoLibrary,
+//                        text = "Из галереи",
+//                        onClick = onOpenGallery,
+//                        modifier = Modifier.weight(1f)
+//                    )
+//
+//                    HomeActionButton(
+//                        icon = Icons.Filled.QrCodeScanner,
+//                        text = "Сканировать штрихкод",
+//                        onClick = onOpenBarcodeScanner,
+//                        modifier = Modifier.weight(1f)
+//                    )
+//                }
+//
+//                Row(
+//                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+//                ) {
+//                    HomeActionButton(
+//                        icon = Icons.Filled.Add,
+//                        text = "Добавить вручную",
+//                        onClick = onOpenAddFood,
+//                        modifier = Modifier.weight(1f)
+//                    )
+//
+//                    HomeActionButton(
+//                        icon = Icons.Filled.BarChart,
+//                        text = "Статистика",
+//                        onClick = {
+//                            foodViewModel.refreshData()
+//                            onOpenStats()
+//                        },
+//                        modifier = Modifier.weight(1f)
+//                    )
+//
+//                    HomeActionButton(
+//                        icon = Icons.Filled.Search,
+//                        text = "Поиск",
+//                        onClick = onOpenSearch,
+//                        modifier = Modifier.weight(1f)
+//                    )
+//                }
+//            }
 
             // Круговой прогресс-бар калорий
             CalorieProgressCard(
@@ -392,10 +394,62 @@ fun MainHomeScreen(
             onOpenProfile = onOpenProfile,
             onOpenGoals = onOpenGoals,
             onLogout = onLogout,
+            onOpenStats = onOpenStats,
+            onAddClick = { showAddSheet = true },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         )
+    }
+
+//    // Кнопка «+» в центре нижней части экрана
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .wrapContentSize(Alignment.BottomCenter)
+//            .padding(bottom = 16.dp),
+//        contentAlignment = Alignment.BottomCenter
+//    ) {
+//        FloatingActionButton(
+//            onClick = { showAddSheet = true },
+//            containerColor = MaterialTheme.colorScheme.primary,
+//            modifier = Modifier.size(56.dp)
+//        ) {
+//            Icon(Icons.Filled.Add, contentDescription = "Добавить запись")
+//        }
+//    }
+
+    // Шторка добавления
+    if (showAddSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showAddSheet = false },
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 8.dp
+        ) {
+            AddFoodBottomSheet(
+                onCameraClick = {
+                    showAddSheet = false
+                    onOpenCamera()
+                },
+                onGalleryClick = {
+                    showAddSheet = false
+                    onOpenGallery()
+                },
+                onBarcodeClick = {
+                    showAddSheet = false
+                    onOpenBarcodeScanner()
+                },
+                onManualAddClick = {
+                    showAddSheet = false
+                    onOpenAddFood()
+                },
+                onSearchClick = {
+                    showAddSheet = false
+                    onOpenSearch()
+                }
+            )
+        }
     }
 
     if (showFullCalendar) {
@@ -407,6 +461,69 @@ fun MainHomeScreen(
             },
             onDismiss = { showFullCalendar = false }
         )
+    }
+}
+
+@Composable
+fun AddFoodBottomSheet(
+    onCameraClick: () -> Unit,
+    onGalleryClick: () -> Unit,
+    onBarcodeClick: () -> Unit,
+    onManualAddClick: () -> Unit,
+    onSearchClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Добавить запись",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        // Верхний ряд — 2 кнопки
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            HomeActionButton(
+                icon = Icons.Filled.CameraAlt,
+                text = "Сделать фото",
+                onClick = onCameraClick,
+                modifier = Modifier.size(100.dp)
+            )
+            HomeActionButton(
+                icon = Icons.Filled.PhotoLibrary,
+                text = "Из галереи",
+                onClick = onGalleryClick,
+                modifier = Modifier.size(100.dp)
+            )
+        }
+        // Нижний ряд — 3 кнопки
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            HomeActionButton(
+                icon = Icons.Filled.QrCodeScanner,
+                text = "Штрих-код",
+                onClick = onBarcodeClick,
+                modifier = Modifier.size(100.dp)
+            )
+            HomeActionButton(
+                icon = Icons.Filled.Add,
+                text = "Вручную",
+                onClick = onManualAddClick,
+                modifier = Modifier.size(100.dp)
+            )
+            HomeActionButton(
+                icon = Icons.Filled.Search,
+                text = "Поиск",
+                onClick = onSearchClick,
+                modifier = Modifier.size(100.dp)
+            )
+        }
     }
 }
 
@@ -1161,6 +1278,8 @@ private fun MacroItem(
 private fun BottomNavigationBar(
     onOpenProfile: () -> Unit,
     onOpenGoals: () -> Unit,
+    onAddClick: () -> Unit,
+    onOpenStats: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -1176,8 +1295,10 @@ private fun BottomNavigationBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(64.dp)
                 .padding(vertical = 8.dp, horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             NavigationButton(
                 icon = Icons.Filled.Person,
@@ -1189,6 +1310,26 @@ private fun BottomNavigationBar(
                 icon = Icons.Filled.TrackChanges,
                 text = "Цели",
                 onClick = onOpenGoals
+            )
+
+            IconButton(
+                onClick = onAddClick,
+                modifier = Modifier
+                    .size(48.dp)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Icon(
+                    Icons.Filled.AddCircle,
+                    contentDescription = "Добавить запись",
+                    tint = colorScheme.primary,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+
+            NavigationButton(
+                icon = Icons.Filled.BarChart,
+                text = "Статистика",
+                onClick = onOpenStats
             )
 
             NavigationButton(
