@@ -78,6 +78,10 @@ fun BarcodeProductScreen(
     var quantity by remember { mutableStateOf("1.0") } // Количество порций
     var notes by remember { mutableStateOf("") }
 
+    var mealType by remember { mutableStateOf("Перекус") }
+    val mealTypes = listOf("Завтрак", "Обед", "Ужин", "Перекус")
+    var isMealExpanded by remember { mutableStateOf(false) }
+
     // Вычисляем итоговые значения на основе ввода
     val quantityValue = quantity.toDoubleOrNull() ?: 1.0
     val servingSizeValue = servingSize.toDoubleOrNull() ?: 100.0
@@ -196,6 +200,37 @@ fun BarcodeProductScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+            ExposedDropdownMenuBox(
+                expanded = isMealExpanded,
+                onExpandedChange = { isMealExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = mealType,
+                    onValueChange = {},
+                    label = { Text("Приём пищи") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isMealExpanded) }
+                )
+                ExposedDropdownMenu(
+                    expanded = isMealExpanded,
+                    onDismissRequest = { isMealExpanded = false }
+                ) {
+                    mealTypes.forEach { type ->
+                        DropdownMenuItem(
+                            text = { Text(type) },
+                            onClick = {
+                                mealType = type
+                                isMealExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
@@ -212,7 +247,8 @@ fun BarcodeProductScreen(
                         date = foodViewModel.selectedDate.value,
                         barcode = product.barcode,
                         originalProduct = product,
-                        source = "scanner"
+                        source = "scanner",
+                        mealType = mealType
                     )
 
                     // Сохраняем через ViewModel

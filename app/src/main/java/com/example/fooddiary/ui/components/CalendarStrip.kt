@@ -1,12 +1,13 @@
 package com.example.fooddiary.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.*
@@ -18,8 +19,6 @@ fun CalendarStrip(
     onCalendarClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val calendar = Calendar.getInstance().apply { time = selectedDate }
-    // Определяем неделю (пн-вс), в которой находится selectedDate
     val weekStart = getWeekStart(selectedDate)
     val days = mutableListOf<Date>()
     val tempCal = Calendar.getInstance().apply { time = weekStart }
@@ -29,7 +28,6 @@ fun CalendarStrip(
     }
 
     Column(modifier = modifier) {
-        // Заголовок недели
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -40,10 +38,7 @@ fun CalendarStrip(
                 style = MaterialTheme.typography.labelLarge
             )
             Row {
-                TextButton(onClick = {
-                    // Сброс на сегодня
-                    onDateSelected(Date())
-                }) {
+                TextButton(onClick = { onDateSelected(Date()) }) {
                     Text("Сегодня")
                 }
                 TextButton(onClick = onCalendarClick) {
@@ -51,7 +46,7 @@ fun CalendarStrip(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -72,26 +67,50 @@ fun CalendarStrip(
 
 @Composable
 private fun DayButton(date: Date, isSelected: Boolean, isToday: Boolean, onClick: () -> Unit) {
-    val dayFormat = SimpleDateFormat("E", Locale.getDefault()) // Пн, Вт...
+    val dayFormat = SimpleDateFormat("E", Locale.getDefault())
     val dateFormat = SimpleDateFormat("d", Locale.getDefault())
-    val color = if (isSelected) MaterialTheme.colorScheme.primary
-    else if (isToday) MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-    else MaterialTheme.colorScheme.onSurface
+    val (backgroundColor, textColor, border) = when {
+        isSelected -> Triple(
+            MaterialTheme.colorScheme.primaryContainer,
+            MaterialTheme.colorScheme.onPrimaryContainer,
+            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+        )
+        isToday -> Triple(
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+            MaterialTheme.colorScheme.primary,
+            BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+        )
+        else -> Triple(
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+            MaterialTheme.colorScheme.onSurface,
+            null
+        )
+    }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Surface(
         modifier = Modifier
             .clickable { onClick() }
-            .padding(4.dp)
+            .padding(horizontal = 2.dp),
+        shape = MaterialTheme.shapes.medium,
+        color = backgroundColor,
+        border = border,
+        tonalElevation = if (isSelected) 2.dp else 0.dp
     ) {
-        Text(text = dayFormat.format(date), style = MaterialTheme.typography.labelSmall, color = color)
-        Text(text = dateFormat.format(date), style = MaterialTheme.typography.bodyLarge, color = color)
-        if (isToday) {
-            Surface(
-                modifier = Modifier.size(6.dp),
-                shape = MaterialTheme.shapes.small,
-                color = MaterialTheme.colorScheme.primary
-            ) {}
+        Column(
+            modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = dayFormat.format(date),
+                style = MaterialTheme.typography.labelSmall,
+                color = textColor
+            )
+            Text(
+                text = dateFormat.format(date),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
+                color = textColor
+            )
         }
     }
 }

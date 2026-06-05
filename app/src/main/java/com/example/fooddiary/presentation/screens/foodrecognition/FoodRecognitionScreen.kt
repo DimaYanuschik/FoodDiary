@@ -43,6 +43,10 @@ fun FoodRecognitionScreen(
     var refineQuery by remember { mutableStateOf("") }
     var showRefineField by remember { mutableStateOf(false) }
 
+    var mealType by remember { mutableStateOf("Перекус") }
+    val mealTypes = listOf("Завтрак", "Обед", "Ужин", "Перекус")
+    var isMealExpanded by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -140,12 +144,43 @@ fun FoodRecognitionScreen(
                             )
                         }
 
+                        Spacer(Modifier.height(16.dp))
+                        ExposedDropdownMenuBox(
+                            expanded = isMealExpanded,
+                            onExpandedChange = { isMealExpanded = it }
+                        ) {
+                            OutlinedTextField(
+                                value = mealType,
+                                onValueChange = {},
+                                label = { Text("Приём пищи") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isMealExpanded) }
+                            )
+                            ExposedDropdownMenu(
+                                expanded = isMealExpanded,
+                                onDismissRequest = { isMealExpanded = false }
+                            ) {
+                                mealTypes.forEach { type ->
+                                    DropdownMenuItem(
+                                        text = { Text(type) },
+                                        onClick = {
+                                            mealType = type
+                                            isMealExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
                         // Уточнение через ИИ
                         if (showRefineField) {
                             OutlinedTextField(
                                 value = refineQuery,
                                 onValueChange = { refineQuery = it },
-                                label = { Text("Уточнить (например: 'это большая порция?')") },
+                                label = { Text("Уточнить") },
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Button(
@@ -167,6 +202,7 @@ fun FoodRecognitionScreen(
                             }
                         }
 
+
                         // Добавление в дневник
                         Button(
                             onClick = {
@@ -178,7 +214,8 @@ fun FoodRecognitionScreen(
                                     fat = result.fat,
                                     carbs = result.carbs,
                                     date = selectedDate,
-                                    mealType = "Перекус"
+//                                    mealType = "Перекус"
+                                    mealType = mealType
                                 )
                                 foodViewModel.addFoodEntry(entry)
                                 onFoodAdded()

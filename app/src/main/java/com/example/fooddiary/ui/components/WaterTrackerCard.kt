@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -82,18 +83,32 @@ fun WaterTrackerCard(
                 if (uiState.entries.isNotEmpty()) {
                     Spacer(Modifier.height(8.dp))
                     Column(
-                        modifier = Modifier.padding(horizontal = 16.dp),
+//                        modifier = Modifier.padding(horizontal = 16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(4.dp)
+                        ,
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         uiState.entries.reversed().forEach { entry ->
-                            Row(
+                            // Оборачиваем каждую строчку в полупрозрачную карточку
+                            Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                shape = RoundedCornerShape(10.dp), // Мягкие скругления углов
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color.White.copy(alpha = 0.5f)
+                                ),
                             ) {
-                                Text("${entry.amountMl} мл")
-                                IconButton(onClick = { onDeleteEntry(entry.id) }) {
-                                    Icon(Icons.Filled.Delete, contentDescription = "Удалить", tint = MaterialTheme.colorScheme.error)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .padding(horizontal = 12.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+
+                                ) {
+                                    Text("${entry.amountMl} мл")
+                                    IconButton(onClick = { onDeleteEntry(entry.id) }) {
+                                        Icon(Icons.Filled.Delete, contentDescription = "Удалить", tint = MaterialTheme.colorScheme.error)
+                                    }
                                 }
                             }
                         }

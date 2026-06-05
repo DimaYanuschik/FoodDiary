@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -297,13 +298,13 @@ fun MainHomeScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Заголовок
-            Text(
-                text = "Трекер питания и калорий",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+//            // Заголовок
+//            Text(
+//                text = "Трекер питания и калорий",
+//                style = MaterialTheme.typography.bodyLarge,
+//                color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                modifier = Modifier.padding(top = 8.dp)
+//            )
 
 //            // Кнопки действий в сетке
 //            Column(
@@ -424,7 +425,7 @@ fun MainHomeScreen(
         ModalBottomSheet(
             onDismissRequest = { showAddSheet = false },
             shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             tonalElevation = 8.dp
         ) {
             AddFoodBottomSheet(
@@ -575,6 +576,8 @@ private fun FoodListSection(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(4.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
 //            // Внутренняя прокрутка для списка еды
 //            FoodListScreenWithScroll(
@@ -799,70 +802,65 @@ fun FoodListContent(
                     else -> Icons.Filled.Cookie   // для "Перекус" и всего остального
                 }
 
-                // Заголовок категории с кнопкой сворачивания
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { expandedMealTypes[mealType] = !isExpanded },
+                    onClick = { expandedMealTypes[mealType] = !isExpanded },
+                    modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = if (isExpanded)
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                            MaterialTheme.colorScheme.primaryContainer
                         else
-                            MaterialTheme.colorScheme.surfaceVariant
+                            MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = if (isExpanded) 4.dp else 2.dp
                     )
                 ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = mealType,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                text = "$mealType (${mealEntries.size})",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold
+                    Column {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = mealType,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
                             )
-                            Spacer(Modifier.height(2.dp))
-//                            Row(verticalAlignment = Alignment.CenterVertically) {
-//                                Icon(
-//                                    imageVector = Icons.Filled.LocalFireDepartment,
-//                                    contentDescription = "Калории",
-//                                    modifier = Modifier.size(16.dp),
-//                                    tint = MaterialTheme.colorScheme.primary
-//                                )
-//                            }
-                            Text(
-                                text = "$catCalories ккал  •  Б: ${String.format("%.1f", catProtein)}  Ж: ${String.format("%.1f",catFat)}  У: ${String.format("%.1f", catCarbs)} г",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            Spacer(Modifier.width(8.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    text = "$mealType (${mealEntries.size})",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(Modifier.height(2.dp))
+                                Text(
+                                    text = "$catCalories ккал  •  Б: ${String.format("%.1f", catProtein)}  Ж: ${String.format("%.1f", catFat)}  У: ${String.format("%.1f", catCarbs)} г",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Icon(
+                                imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                contentDescription = if (isExpanded) "Свернуть" else "Развернуть"
                             )
                         }
-                        Icon(
-                            imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                            contentDescription = if (isExpanded) "Свернуть" else "Развернуть"
-                        )
-                    }
-                }
 
-                // Содержимое категории
-                AnimatedVisibility(visible = isExpanded) {
-                    Column(
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        mealEntries.forEach { food ->
-                            FoodItemCard(food = food, onDelete = { onDelete(food.id) })
+                        AnimatedVisibility(visible = isExpanded) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(bottom = 12.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                mealEntries.forEach { food ->
+                                    FoodItemCard(food = food, onDelete = { onDelete(food.id) })
+                                }
+                            }
                         }
                     }
                 }
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
             }
         }
     }
@@ -1378,7 +1376,10 @@ fun HomeActionButton(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
-        onClick = onClick
+        onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        ),
     ) {
         Column(
             modifier = Modifier

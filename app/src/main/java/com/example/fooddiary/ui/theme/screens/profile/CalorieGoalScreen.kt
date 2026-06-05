@@ -1,5 +1,6 @@
 package com.example.fooddiary.ui.screens.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -638,19 +639,23 @@ fun MacroNutrientRow(
                 FilterChip(
                     selected = mode == "percent",
                     onClick = { onModeChange("percent") },
-                    label = { Text("%") }
+                    label = { Text("%") },
+                    border = BorderStroke(1.dp, if (mode == "percent") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant)
                 )
                 Spacer(Modifier.width(4.dp))
                 FilterChip(
                     selected = mode == "grams",
                     onClick = { onModeChange("grams") },
-                    label = { Text("г") }
+                    label = { Text("г") },
+                    border = BorderStroke(1.dp, if (mode == "grams") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant)
+
                 )
                 Spacer(Modifier.width(4.dp))
                 FilterChip(
                     selected = mode == "grams_per_kg",
                     onClick = { onModeChange("grams_per_kg") },
-                    label = { Text("г/кг") }
+                    label = { Text("г/кг") },
+                    border = BorderStroke(1.dp, if (mode == "grams_per_kg") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant)
                 )
             }
         }
