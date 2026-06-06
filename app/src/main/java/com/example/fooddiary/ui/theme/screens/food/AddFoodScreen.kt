@@ -350,7 +350,7 @@ fun AddFoodScreen(
                 } else {
                     Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Добавить блюдо")
+                    Text("Добавить в дневник")
                 }
             }
         }

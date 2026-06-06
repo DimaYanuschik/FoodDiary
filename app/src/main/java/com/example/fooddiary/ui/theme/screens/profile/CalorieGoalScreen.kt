@@ -586,7 +586,10 @@ fun CalorieGoalScreen(
             }
 
             // Предпросмотр
-            Card {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            ) {
                 Column(Modifier.padding(16.dp)) {
                     Text("Предварительный просмотр", style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(12.dp))
@@ -680,7 +683,8 @@ fun MacroNutrientRow(
                 else -> "≈ ${grams} г • ${"%.1f".format(gramsPerKg)} г/кг"
             },
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp)
         )
     }
 }

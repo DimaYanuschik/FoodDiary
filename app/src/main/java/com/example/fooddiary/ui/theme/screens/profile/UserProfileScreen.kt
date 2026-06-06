@@ -225,7 +225,7 @@ fun UserProfileScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "${viewModel.currentUserId}")
+//            Text(text = "${viewModel.currentUserId}")
             // Имя
             OutlinedTextField(
                 value = name,
