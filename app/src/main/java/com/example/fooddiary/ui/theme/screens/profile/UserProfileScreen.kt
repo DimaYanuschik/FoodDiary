@@ -1,7 +1,9 @@
 package com.example.fooddiary.ui.screens.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -10,7 +12,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,6 +22,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddiary.data_old.models.*
 import com.example.fooddiary.ui.components.DatePicker
+import com.example.fooddiary.ui.theme.WireframeTheme
 import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -591,5 +596,235 @@ private fun getBmiCategory(bmi: Double): String {
         bmi < 35 -> "Ожирение 1 степени"
         bmi < 40 -> "Ожирение 2 степени"
         else -> "Ожирение 3 степени"
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun UserProfileScreenPreview_Wireframe() {
+    WireframeTheme {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Настройка профиля", color = Color.Black) },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Назад",
+                                tint = Color.Black
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
+                )
+            },
+            bottomBar = {
+                Surface(tonalElevation = 8.dp) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text("Рекомендуемая норма:", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+                                Box(modifier = Modifier.width(100.dp).height(24.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text("изменения отразятся после сохранения", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .background(Color.DarkGray, RoundedCornerShape(12.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Сохранить профиль", color = Color.White)
+                        }
+                    }
+                }
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Поле Имя
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    label = { Text("Имя") },
+                    modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = { Box(modifier = Modifier.size(20.dp).background(Color.DarkGray, RoundedCornerShape(4.dp))) },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedBorderColor = Color.LightGray,
+                        unfocusedBorderColor = Color.LightGray
+                    )
+                )
+
+                // Поле Пол
+                ExposedDropdownMenuBox(
+                    expanded = false,
+                    onExpandedChange = {}
+                ) {
+                    OutlinedTextField(
+                        value = "",
+                        onValueChange = {},
+                        label = { Text("Пол") },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+                        readOnly = true,
+                        leadingIcon = { Box(modifier = Modifier.size(20.dp).background(Color.DarkGray, RoundedCornerShape(4.dp))) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = false) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            focusedBorderColor = Color.LightGray,
+                            unfocusedBorderColor = Color.LightGray
+                        )
+                    )
+                }
+
+                // Дата рождения
+                Card(modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                        Text("Дата рождения", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+                        Spacer(Modifier.height(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .background(Color(0xFFEEEEEE), RoundedCornerShape(8.dp))
+                                .padding(horizontal = 12.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Box(modifier = Modifier.size(20.dp).background(Color.DarkGray, RoundedCornerShape(4.dp)))
+                                Column {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("Дата рождения: ", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+                                        Box(modifier = Modifier.width(80.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                    }
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("Возраст: ", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                                        Box(modifier = Modifier.width(40.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                        Text(" лет", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+//                // Вес и рост
+//                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//                    OutlinedTextField(
+//                        value = "",
+//                        onValueChange = {},
+//                        label = { Text("Вес") },
+//                        modifier = Modifier.weight(1f),
+//                        leadingIcon = { Box(modifier = Modifier.size(20.dp).background(Color.DarkGray, RoundedCornerShape(4.dp))) },
+//                        trailingIcon = { Text("кг") },
+//                        suffix = { Text("кг") },
+//                        singleLine = true,
+//                        colors = OutlinedTextFieldDefaults.colors(
+//                            focusedTextColor = Color.Black,
+//                            unfocusedTextColor = Color.Black,
+//                            focusedBorderColor = Color.LightGray,
+//                            unfocusedBorderColor = Color.LightGray
+//                        )
+//                    )
+//                    OutlinedTextField(
+//                        value = "",
+//                        onValueChange = {},
+//                        label = { Text("Рост") },
+//                        modifier = Modifier.weight(1f),
+//                        leadingIcon = { Box(modifier = Modifier.size(20.dp).background(Color.DarkGray, RoundedCornerShape(4.dp))) },
+//                        trailingIcon = { Text("см") },
+//                        suffix = { Text("см") },
+//                        singleLine = true,
+//                        colors = OutlinedTextFieldDefaults.colors(
+//                            focusedTextColor = Color.Black,
+//                            unfocusedTextColor = Color.Black,
+//                            focusedBorderColor = Color.LightGray,
+//                            unfocusedBorderColor = Color.LightGray
+//                        )
+//                    )
+//                }
+//
+//                // Уровень активности
+//                ExposedDropdownMenuBox(
+//                    expanded = false,
+//                    onExpandedChange = {}
+//                ) {
+//                    OutlinedTextField(
+//                        value = "",
+//                        onValueChange = {},
+//                        label = { Text("Уровень активности") },
+//                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+//                        readOnly = true,
+//                        leadingIcon = { Box(modifier = Modifier.size(20.dp).background(Color.DarkGray, RoundedCornerShape(4.dp))) },
+//                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = false) },
+//                        colors = OutlinedTextFieldDefaults.colors(
+//                            focusedTextColor = Color.Black,
+//                            unfocusedTextColor = Color.Black,
+//                            focusedBorderColor = Color.LightGray,
+//                            unfocusedBorderColor = Color.LightGray
+//                        )
+//                    )
+//                }
+//
+//                // Цель
+//                ExposedDropdownMenuBox(
+//                    expanded = false,
+//                    onExpandedChange = {}
+//                ) {
+//                    OutlinedTextField(
+//                        value = "",
+//                        onValueChange = {},
+//                        label = { Text("Цель") },
+//                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+//                        readOnly = true,
+//                        leadingIcon = { Box(modifier = Modifier.size(20.dp).background(Color.DarkGray, RoundedCornerShape(4.dp))) },
+//                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = false) },
+//                        colors = OutlinedTextFieldDefaults.colors(
+//                            focusedTextColor = Color.Black,
+//                            unfocusedTextColor = Color.Black,
+//                            focusedBorderColor = Color.LightGray,
+//                            unfocusedBorderColor = Color.LightGray
+//                        )
+//                    )
+//                }
+
+                // ИМТ
+                Card(modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                        Text("Индекс массы тела (ИМТ):", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+                        Box(modifier = Modifier.width(60.dp).height(28.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                        Spacer(Modifier.height(4.dp))
+                        Box(modifier = Modifier.width(140.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                    }
+                }
+            }
+        }
     }
 }

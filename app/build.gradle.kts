@@ -77,7 +77,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.lifecycle.runtime.compose)
-
     // CameraX (ИСПРАВЛЕННЫЕ ВЕРСИИ)
 //    val cameraxVersion = "1.3.2"  // Более стабильная версия
     val cameraxVersion = "1.4.1"  // Более стабильная версия

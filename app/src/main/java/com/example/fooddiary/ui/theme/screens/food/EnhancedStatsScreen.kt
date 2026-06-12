@@ -2,8 +2,11 @@ package com.example.fooddiary.ui.screens.stats
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,11 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.example.fooddiary.ui.components.charts.MacroDistributionChart
+import com.example.fooddiary.ui.theme.WireframeTheme
 import com.example.fooddiary.ui.viewmodels.CalorieGoalViewModel
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import java.text.SimpleDateFormat
@@ -616,5 +621,536 @@ private fun CompactCircularChart(
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurface
         )
+    }
+}
+
+
+
+
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun EnhancedStatsScreenPreview_Wireframe() {
+    WireframeTheme {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Детальная статистика", color = Color.Black) },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Назад", tint = Color.Black)
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
+                )
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+            ) {
+//                // Заголовок с датой
+//                Card(
+//                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+//                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+//                ) {
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Column {
+//                            Text("Статистика за", style = MaterialTheme.typography.labelMedium, color = Color.DarkGray)
+//                            // Переменная дата
+//                            Box(modifier = Modifier.width(160.dp).height(20.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                        }
+//                        Icon(Icons.Filled.CalendarToday, contentDescription = null, tint = Color.DarkGray)
+//                    }
+//                }
+
+//                // Прогресс по калориям
+//                Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+//                    colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(0.6f))
+//                ) {
+//                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+//                        Text("Прогресс по калориям", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+//                        Spacer(Modifier.height(16.dp))
+//
+//                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+//                            // Калории
+//                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                                Box(
+//                                    modifier = Modifier.size(80.dp).background(Color.White, CircleShape).border(4.dp, Color.DarkGray, CircleShape),
+//                                    contentAlignment = Alignment.Center
+//                                ) {
+//                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                                        Box(modifier = Modifier.width(30.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                        Spacer(Modifier.height(2.dp))
+//                                        Box(modifier = Modifier.width(40.dp).height(10.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                    }
+//                                }
+//                                Spacer(Modifier.height(6.dp))
+//                                Text("Калории", style = MaterialTheme.typography.labelSmall, color = Color.Black)
+//                            }
+//                            // Белки
+//                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                                Box(
+//                                    modifier = Modifier.size(80.dp).background(Color.White, CircleShape).border(4.dp, Color.DarkGray, CircleShape),
+//                                    contentAlignment = Alignment.Center
+//                                ) {
+//                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                                        Box(modifier = Modifier.width(30.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                        Spacer(Modifier.height(2.dp))
+//                                        Box(modifier = Modifier.width(40.dp).height(10.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                    }
+//                                }
+//                                Spacer(Modifier.height(6.dp))
+//                                Text("Белки", style = MaterialTheme.typography.labelSmall, color = Color.Black)
+//                            }
+//                        }
+//                        Spacer(Modifier.height(12.dp))
+//                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+//                            // Жиры
+//                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                                Box(
+//                                    modifier = Modifier.size(80.dp).background(Color.White, CircleShape).border(4.dp, Color.DarkGray, CircleShape),
+//                                    contentAlignment = Alignment.Center
+//                                ) {
+//                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                                        Box(modifier = Modifier.width(30.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                        Spacer(Modifier.height(2.dp))
+//                                        Box(modifier = Modifier.width(40.dp).height(10.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                    }
+//                                }
+//                                Spacer(Modifier.height(6.dp))
+//                                Text("Жиры", style = MaterialTheme.typography.labelSmall, color = Color.Black)
+//                            }
+//                            // Углеводы
+//                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                                Box(
+//                                    modifier = Modifier.size(80.dp).background(Color.White, CircleShape).border(4.dp, Color.DarkGray, CircleShape),
+//                                    contentAlignment = Alignment.Center
+//                                ) {
+//                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                                        Box(modifier = Modifier.width(30.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                        Spacer(Modifier.height(2.dp))
+//                                        Box(modifier = Modifier.width(40.dp).height(10.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                    }
+//                                }
+//                                Spacer(Modifier.height(6.dp))
+//                                Text("Углеводы", style = MaterialTheme.typography.labelSmall, color = Color.Black)
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                Spacer(Modifier.height(16.dp))
+//
+//                // Легенда цветов
+//                Card(
+//                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+//                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+//                ) {
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+//                        horizontalArrangement = Arrangement.SpaceEvenly,
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        LegendItem(color = Color(0xFF4CAF50), label = "Ниже нормы")
+//                        LegendItem(color = Color(0xFFFFC107), label = "Близко к норме")
+//                        LegendItem(color = Color(0xFFF44336), label = "Превышение")
+//                    }
+//                }
+//
+//                Spacer(Modifier.height(16.dp))
+//
+//                // Средние показатели за неделю
+//                Card(
+//                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+//                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+//                ) {
+//                    Column(modifier = Modifier.padding(16.dp)) {
+//                        Text("Средние показатели за неделю", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium, color = Color.Black)
+//                        Spacer(Modifier.height(12.dp))
+//
+//                        // Калории
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Text("Калории", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.width(80.dp), color = Color.Black)
+//                            Box(
+//                                modifier = Modifier
+//                                    .weight(1f)
+//                                    .height(6.dp)
+//                                    .padding(horizontal = 8.dp)
+//                                    .background(Color.LightGray, RoundedCornerShape(3.dp))
+//                            ) {
+//                                Box(
+//                                    modifier = Modifier
+//                                        .fillMaxHeight()
+//                                        .fillMaxWidth(0.75f)
+//                                        .background(Color(0xFF4CAF50), RoundedCornerShape(3.dp))
+//                                )
+//                            }
+//                            Row(
+//                                modifier = Modifier.width(90.dp),
+//                                verticalAlignment = Alignment.CenterVertically
+//                            ) {
+//                                Box(modifier = Modifier.width(20.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                Text(" / ", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+//                                Box(modifier = Modifier.width(20.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                Text(" ккал", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+//                            }
+//                        }
+//
+//                        Spacer(Modifier.height(8.dp))
+//
+//                        // Белки
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Text("Белки", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.width(80.dp), color = Color.Black)
+//                            Box(
+//                                modifier = Modifier
+//                                    .weight(1f)
+//                                    .height(6.dp)
+//                                    .padding(horizontal = 8.dp)
+//                                    .background(Color.LightGray, RoundedCornerShape(3.dp))
+//                            ) {
+//                                Box(
+//                                    modifier = Modifier
+//                                        .fillMaxHeight()
+//                                        .fillMaxWidth(0.9f)
+//                                        .background(Color(0xFFFFC107), RoundedCornerShape(3.dp))
+//                                )
+//                            }
+//                            Row(
+//                                modifier = Modifier.width(90.dp),
+//                                verticalAlignment = Alignment.CenterVertically
+//                            ) {
+//                                Box(modifier = Modifier.width(20.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                Text(" / ", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+//                                Box(modifier = Modifier.width(20.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                Text(" г", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+//                            }
+//                        }
+//
+//                        Spacer(Modifier.height(8.dp))
+//
+//                        // Жиры
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Text("Жиры", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.width(80.dp), color = Color.Black)
+//                            Box(
+//                                modifier = Modifier
+//                                    .weight(1f)
+//                                    .height(6.dp)
+//                                    .padding(horizontal = 8.dp)
+//                                    .background(Color.LightGray, RoundedCornerShape(3.dp))
+//                            ) {
+//                                Box(
+//                                    modifier = Modifier
+//                                        .fillMaxHeight()
+//                                        .fillMaxWidth(1f)
+//                                        .background(Color(0xFFF44336), RoundedCornerShape(3.dp))
+//                                )
+//                            }
+//                            Row(
+//                                modifier = Modifier.width(90.dp),
+//                                verticalAlignment = Alignment.CenterVertically
+//                            ) {
+//                                Box(modifier = Modifier.width(20.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                Text(" / ", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+//                                Box(modifier = Modifier.width(20.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                Text(" г", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+//                            }
+//                        }
+//
+//                        Spacer(Modifier.height(8.dp))
+//
+//                        // Углеводы
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Text("Углеводы", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.width(80.dp), color = Color.Black)
+//                            Box(
+//                                modifier = Modifier
+//                                    .weight(1f)
+//                                    .height(6.dp)
+//                                    .padding(horizontal = 8.dp)
+//                                    .background(Color.LightGray, RoundedCornerShape(3.dp))
+//                            ) {
+//                                Box(
+//                                    modifier = Modifier
+//                                        .fillMaxHeight()
+//                                        .fillMaxWidth(0.5f)
+//                                        .background(Color(0xFF4CAF50), RoundedCornerShape(3.dp))
+//                                )
+//                            }
+//                            Row(
+//                                modifier = Modifier.width(90.dp),
+//                                verticalAlignment = Alignment.CenterVertically
+//                            ) {
+//                                Box(modifier = Modifier.width(20.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                Text(" / ", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+//                                Box(modifier = Modifier.width(20.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                Text(" г", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+//                            }
+//                        }
+//                    }
+//                }
+
+                Spacer(Modifier.height(16.dp))
+
+//                // Прогресс за неделю
+//                Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+//                    colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(0.6f))
+//                ) {
+//                    Column(modifier = Modifier.padding(16.dp)) {
+//                        Text("Прогресс за неделю", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+//                        Spacer(Modifier.height(12.dp))
+//
+//                        val dayNames = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
+//                        val calProgresses = listOf(0.5f, 0.9f, 0.75f, 1.2f, 0.3f, 0.6f, 0.85f)
+//                        val calColors = listOf(
+//                            Color(0xFF4CAF50),
+//                            Color(0xFFFFC107),
+//                            Color(0xFF4CAF50),
+//                            Color(0xFFF44336),
+//                            Color(0xFF4CAF50),
+//                            Color(0xFF4CAF50),
+//                            Color(0xFFFFC107)
+//                        )
+//
+//                        dayNames.forEachIndexed { index, name ->
+//                            Column(modifier = Modifier.padding(vertical = 4.dp)) {
+//                                Row(verticalAlignment = Alignment.CenterVertically) {
+//                                    Column(modifier = Modifier.width(60.dp)) {
+//                                        Text(name, style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+//                                        Box(modifier = Modifier.width(30.dp).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                    }
+//                                    Column(modifier = Modifier.weight(1f)) {
+//                                        // Линейный индикатор калорий с текстом справа
+//                                        Row(verticalAlignment = Alignment.CenterVertically) {
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .weight(1f)
+//                                                    .height(6.dp)
+//                                                    .padding(end = 8.dp)
+//                                                    .background(Color.LightGray, RoundedCornerShape(3.dp))
+//                                            ) {
+//                                                Box(
+//                                                    modifier = Modifier
+//                                                        .fillMaxHeight()
+//                                                        .fillMaxWidth(calProgresses[index].coerceAtMost(1f))
+//                                                        .background(calColors[index], RoundedCornerShape(3.dp))
+//                                                )
+//                                            }
+//                                            // Текст: XXXX / XXXX
+//                                            Row(
+//                                                modifier = Modifier.width(90.dp),
+//                                                verticalAlignment = Alignment.CenterVertically
+//                                            ) {
+//                                                Box(modifier = Modifier.weight(1f).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                                Text(" / ", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+//                                                Box(modifier = Modifier.weight(1f).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+//                                            }
+//                                        }
+//                                        Spacer(Modifier.height(2.dp))
+//                                        // Мини-индикаторы БЖУ с подписями и разной длиной
+//                                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+//                                            Text("Б", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .width(24.dp)
+//                                                    .height(4.dp)
+//                                                    .background(Color.LightGray, RoundedCornerShape(2.dp))
+//                                            ) {
+//                                                Box(
+//                                                    modifier = Modifier
+//                                                        .fillMaxHeight()
+//                                                        .fillMaxWidth(0.5f + index * 0.07f)
+//                                                        .background(
+//                                                            if (index < 3) Color(0xFF4CAF50) else if (index < 5) Color(0xFFFFC107) else Color(0xFFF44336),
+//                                                            RoundedCornerShape(2.dp)
+//                                                        )
+//                                                )
+//                                            }
+//                                            Spacer(Modifier.width(2.dp))
+//                                            Text("Ж", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .width(24.dp)
+//                                                    .height(4.dp)
+//                                                    .background(Color.LightGray, RoundedCornerShape(2.dp))
+//                                            ) {
+//                                                Box(
+//                                                    modifier = Modifier
+//                                                        .fillMaxHeight()
+//                                                        .fillMaxWidth(0.4f + index * 0.08f)
+//                                                        .background(
+//                                                            if (index < 2) Color(0xFF4CAF50) else if (index < 4) Color(0xFFFFC107) else Color(0xFFF44336),
+//                                                            RoundedCornerShape(2.dp)
+//                                                        )
+//                                                )
+//                                            }
+//                                            Spacer(Modifier.width(2.dp))
+//                                            Text("У", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .width(24.dp)
+//                                                    .height(4.dp)
+//                                                    .background(Color.LightGray, RoundedCornerShape(2.dp))
+//                                            ) {
+//                                                Box(
+//                                                    modifier = Modifier
+//                                                        .fillMaxHeight()
+//                                                        .fillMaxWidth(0.6f + index * 0.05f)
+//                                                        .background(
+//                                                            if (index < 4) Color(0xFF4CAF50) else Color(0xFFFFC107),
+//                                                            RoundedCornerShape(2.dp)
+//                                                        )
+//                                                )
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                                if (index < dayNames.size - 1) {
+//                                    Spacer(Modifier.height(4.dp))
+//                                    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+//                                    Spacer(Modifier.height(4.dp))
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+
+                Spacer(Modifier.height(16.dp))
+
+                // Итоги за день
+                Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(0.6f))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Итоги за день", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                        Spacer(Modifier.height(16.dp))
+
+                        // Осталось калорий
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Осталось калорий", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(50.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" ккал", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+
+                        // Осталось белков
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Осталось белков", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(50.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+
+                        // Осталось жиров
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Осталось жиров", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(50.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+
+                        // Осталось углеводов
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Осталось углеводов", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(50.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                // Советы и рекомендации
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
+                            Icon(Icons.Filled.Lightbulb, contentDescription = null, tint = Color.DarkGray, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Советы и рекомендации", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                        }
+                        Box(modifier = Modifier.fillMaxWidth().height(40.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                        Spacer(Modifier.height(8.dp))
+                        Box(modifier = Modifier.width(200.dp).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                    }
+                }
+            }
+        }
+    }
+}
+
+//@Composable
+//private fun LegendItem(color: Color, label: String) {
+//    Row(verticalAlignment = Alignment.CenterVertically) {
+//        Box(
+//            modifier = Modifier
+//                .size(12.dp)
+//                .background(color = color, shape = MaterialTheme.shapes.extraSmall)
+//        )
+//        Spacer(modifier = Modifier.width(4.dp))
+//        Text(text = label, style = MaterialTheme.typography.labelSmall, color = Color.Black)
+//    }
+//}
+
+@Composable
+private fun MacroSummaryRow(
+    label: String,
+    unit: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.width(80.dp),
+            color = Color.Black
+        )
+        Box(modifier = Modifier.weight(1f).height(6.dp).padding(horizontal = 8.dp).background(Color.DarkGray, RoundedCornerShape(3.dp)))
+        Box(modifier = Modifier.width(90.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
     }
 }

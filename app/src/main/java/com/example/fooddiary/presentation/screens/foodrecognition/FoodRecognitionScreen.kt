@@ -2,25 +2,33 @@ package com.example.fooddiary.presentation.screens.foodrecognition
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.example.fooddiary.data_old.models.ScannedFoodEntry
+import com.example.fooddiary.ui.theme.WireframeTheme
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import java.util.*
 
@@ -236,5 +244,156 @@ private fun NutrientItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun FoodRecognitionScreenPreview_Wireframe() {
+    WireframeTheme {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Распознавание блюда", color = Color.Black) },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Назад", tint = Color.Black)
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
+                )
+            }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Фото-заглушка
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .background(Color.LightGray, RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Filled.Image, contentDescription = null, tint = Color.DarkGray, modifier = Modifier.size(48.dp))
+                }
+
+                // Карточка с редактируемыми полями
+                Card(modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                ) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        // Название блюда
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .background(Color.White, RoundedCornerShape(8.dp))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                                .padding(start = 12.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text("Название блюда", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+                        }
+
+                        // Калории
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .background(Color.White, RoundedCornerShape(8.dp))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                                .padding(start = 12.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text("Калории (ккал)", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+                        }
+
+                        // БЖУ
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp)
+                                    .background(Color.White, RoundedCornerShape(8.dp))
+                                    .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                                    .padding(start = 12.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Text("Белки (г)", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp)
+                                    .background(Color.White, RoundedCornerShape(8.dp))
+                                    .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                                    .padding(start = 12.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Text("Жиры (г)", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp)
+                                    .background(Color.White, RoundedCornerShape(8.dp))
+                                    .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                                    .padding(start = 12.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Text("Углеводы (г)", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            }
+                        }
+
+                        // Приём пищи
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .background(Color.White, RoundedCornerShape(8.dp))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                                .padding(start = 12.dp, end = 12.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Приём пищи", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+                                Icon(Icons.Filled.ArrowDropDown, contentDescription = null, tint = Color.DarkGray)
+                            }
+                        }
+
+                        // Кнопка "Уточнить через ИИ"
+                        TextButton(onClick = {}) {
+                            Text("Уточнить через ИИ", color = Color.Black)
+                        }
+
+                        // Кнопка "Добавить в дневник"
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .background(Color.DarkGray, RoundedCornerShape(30.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Добавить в дневник", color = Color.White)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

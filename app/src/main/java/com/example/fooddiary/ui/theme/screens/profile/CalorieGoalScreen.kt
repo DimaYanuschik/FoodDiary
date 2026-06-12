@@ -1,8 +1,11 @@
 package com.example.fooddiary.ui.screens.profile
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -11,12 +14,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fooddiary.data_old.models.CalorieGoal
+import com.example.fooddiary.ui.theme.WireframeTheme
 import com.example.fooddiary.ui.viewmodels.CalorieGoalViewModel
 import com.example.fooddiary.ui.viewmodels.UserProfileViewModel
 import kotlin.math.roundToInt
@@ -686,5 +693,357 @@ fun MacroNutrientRow(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp)
         )
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun CalorieGoalScreenPreview_Wireframe() {
+    WireframeTheme {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Цели по калориям", color = Color.Black) },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Назад", tint = Color.Black)
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
+                )
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Карточка с рекомендацией из профиля
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Рекомендовано на основе профиля:", style = MaterialTheme.typography.labelMedium, color = Color.Black)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Box(modifier = Modifier.width(100.dp).height(24.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        // Кнопка со скруглением 12dp
+                        Box(
+                            modifier = Modifier
+                                .background(Color.DarkGray, RoundedCornerShape(50.dp))
+                                .padding(horizontal = 16.dp, vertical = 10.dp)
+                        ) {
+                            Text("Использовать рекомендацию", color = Color.White, modifier = Modifier.padding(horizontal = 16.dp))
+                        }
+                    }
+                }
+
+                // Поле калорий с suffix "ккал"
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    label = { Text("Калории в день") },
+                    modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = { Text("ккал") },
+                    suffix = { Text("ккал") },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedBorderColor = Color.LightGray,
+                        unfocusedBorderColor = Color.LightGray
+                    )
+                )
+
+                // Карточка распределения БЖУ
+                Card(modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Распределение БЖУ", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                        Spacer(Modifier.height(12.dp))
+
+                        // Белки (режим %)
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("Белки", style = MaterialTheme.typography.bodyMedium, color = Color.Black, modifier = Modifier.weight(1f))
+                                Row {
+                                    // Кнопка % (активная)
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color.DarkGray, RoundedCornerShape(8.dp))
+                                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("%", color = Color.White)
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                    // Кнопка "г"
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color.White, RoundedCornerShape(8.dp))
+                                            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("г", color = Color.Black)
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                    // Кнопка "г/кг"
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color.White, RoundedCornerShape(8.dp))
+                                            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("г/кг", color = Color.Black)
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.height(4.dp))
+                            // Поле ввода
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .background(Color.White, RoundedCornerShape(8.dp))
+                                    .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 12.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Значение-заглушка
+                                    Box(modifier = Modifier.width(60.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                    // Единица измерения
+                                    Text(
+                                        text = "%",
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                                        color = Color.DarkGray
+                                    )                                }
+                            }
+                            Spacer(Modifier.height(4.dp))
+                            // Эквиваленты: ≈ X г • X г/кг (режим % -> показываем г и г/кг)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("≈ ", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                                Box(modifier = Modifier.width(40.dp).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г • ", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                                Box(modifier = Modifier.width(40.dp).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г/кг", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            }
+                        }
+
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                        // Жиры (режим г)
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("Жиры", style = MaterialTheme.typography.bodyMedium, color = Color.Black, modifier = Modifier.weight(1f))
+                                Row {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color.White, RoundedCornerShape(8.dp))
+                                            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("%", color = Color.Black)
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color.DarkGray, RoundedCornerShape(8.dp))
+                                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("г", color = Color.White)
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color.White, RoundedCornerShape(8.dp))
+                                            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("г/кг", color = Color.Black)
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.height(4.dp))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .background(Color.White, RoundedCornerShape(8.dp))
+                                    .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 12.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Значение-заглушка
+                                    Box(modifier = Modifier.width(60.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                    // Единица измерения
+                                    Text(
+                                        text = "г",
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                                        color = Color.DarkGray
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.height(4.dp))
+                            // Эквиваленты: ≈ X % • X г/кг (режим г -> показываем % и г/кг)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("≈ ", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                                Box(modifier = Modifier.width(30.dp).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text("% • ", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                                Box(modifier = Modifier.width(40.dp).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г/кг", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            }
+                        }
+
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                        // Углеводы (режим г/кг)
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("Углеводы", style = MaterialTheme.typography.bodyMedium, color = Color.Black, modifier = Modifier.weight(1f))
+                                Row {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color.White, RoundedCornerShape(8.dp))
+                                            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("%", color = Color.Black)
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color.White, RoundedCornerShape(8.dp))
+                                            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("г", color = Color.Black)
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color.DarkGray, RoundedCornerShape(8.dp))
+                                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text("г/кг", color = Color.White)
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.height(4.dp))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .background(Color.White, RoundedCornerShape(8.dp))
+                                    .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 12.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Значение-заглушка
+                                    Box(modifier = Modifier.width(60.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                    // Единица измерения
+                                    Text(
+                                        text = "г/кг",
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                                        color = Color.DarkGray
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.height(4.dp))
+                            // Эквиваленты: ≈ X г • X % (режим г/кг -> показываем г и %)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("≈ ", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                                Box(modifier = Modifier.width(40.dp).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г • ", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                                Box(modifier = Modifier.width(30.dp).height(12.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text("%", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            }
+                        }
+                    }
+                }
+
+                // Предпросмотр
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Предварительный просмотр", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                        Spacer(Modifier.height(12.dp))
+                        Row(Modifier.fillMaxWidth()) {
+                            Text("Белки: ", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(40.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г (", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                                Box(modifier = Modifier.width(30.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text("%)", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+                        Row(Modifier.fillMaxWidth()) {
+                            Text("Жиры: ", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(40.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г (", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                                Box(modifier = Modifier.width(30.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text("%)", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+                        Row(Modifier.fillMaxWidth()) {
+                            Text("Углеводы: ", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(40.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г (", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                                Box(modifier = Modifier.width(30.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text("%)", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Калорий из БЖУ: ", style = MaterialTheme.typography.bodySmall, color = Color.Black)
+                            Box(modifier = Modifier.width(50.dp).height(14.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                            Text(" ккал", style = MaterialTheme.typography.bodySmall, color = Color.Black)
+                        }
+                    }
+                }
+
+                // Кнопка сохранения
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .background(Color.DarkGray, RoundedCornerShape(30.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Сохранить цели", color = Color.White)
+                }
+
+                Spacer(Modifier.height(8.dp))
+            }
+        }
     }
 }

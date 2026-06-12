@@ -1,20 +1,27 @@
 package com.example.fooddiary.ui.screens.food
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.example.fooddiary.data_old.models.ScannedFoodEntry
+import com.example.fooddiary.ui.theme.WireframeTheme
 import com.example.fooddiary.ui.viewmodels.FoodViewModel
 import java.util.*
 
@@ -351,6 +358,248 @@ fun AddFoodScreen(
                     Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
                     Text("Добавить в дневник")
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun AddFoodScreenPreview_Wireframe() {
+    WireframeTheme {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Добавить блюдо", color = Color.Black) },
+                    navigationIcon = {
+                        IconButton(onClick = {}) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Назад", tint = Color.Black)
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
+                )
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Поле "Название блюда"
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                        .padding(start = 12.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(modifier = Modifier.size(24.dp).background(Color.DarkGray, RoundedCornerShape(4.dp)))
+                        Spacer(Modifier.width(12.dp))
+                        Text("Название блюда", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+                    }
+                }
+
+                // Поле "Приём пищи"
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                        .padding(start = 12.dp, end = 12.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(24.dp).background(Color.DarkGray, RoundedCornerShape(4.dp)))
+                            Spacer(Modifier.width(12.dp))
+                            Text("Приём пищи", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+                        }
+                        Icon(Icons.Filled.ArrowDropDown, contentDescription = null, tint = Color.DarkGray)
+                    }
+                }
+
+                // Состав на 100 г
+                Text("Состав на 100 г", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Белки
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp)
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                            .padding(start = 12.dp, end = 12.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Белки", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            Spacer(Modifier.weight(1f))
+                            Text("г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                        }
+                    }
+                    // Жиры
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp)
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                            .padding(start = 12.dp, end = 12.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Жиры", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            Spacer(Modifier.weight(1f))
+                            Text("г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                        }
+                    }
+                    // Углеводы
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp)
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                            .padding(start = 12.dp, end = 12.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Углеводы", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            Spacer(Modifier.weight(1f))
+                            Text("г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                        }
+                    }
+                }
+
+                // Вес порции и количество
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Вес порции
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp)
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                            .padding(start = 12.dp, end = 12.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Вес порции", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            Spacer(Modifier.weight(1f))
+                            Text("г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                        }
+                    }
+                    // Кол-во порций
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp)
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                            .padding(start = 12.dp, end = 12.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Кол-во порций", style = MaterialTheme.typography.bodySmall, color = Color.DarkGray)
+                            Spacer(Modifier.weight(1f))
+                            Text("шт", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                        }
+                    }
+                }
+
+                // Калории
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .border(1.dp, Color.DarkGray, RoundedCornerShape(8.dp))
+                        .padding(start = 12.dp, end = 12.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(modifier = Modifier.size(24.dp).background(Color.DarkGray, RoundedCornerShape(4.dp)))
+                        Spacer(Modifier.width(12.dp))
+                        Text("Калории", style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
+                        Spacer(Modifier.weight(1f))
+                        Text("ккал", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                    }
+                }
+
+                // Карточка "Итоговые значения"
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Итоговые значения", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                        Spacer(Modifier.height(8.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Белки:", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(50.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Жиры:", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(50.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Углеводы:", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(modifier = Modifier.width(50.dp).height(16.dp).background(Color.LightGray, RoundedCornerShape(4.dp)))
+                                Text(" г", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                // Кнопка "Добавить в дневник"
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .background(Color.DarkGray, RoundedCornerShape(30.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text("Добавить в дневник", color = Color.White)
+                    }
                 }
             }
         }
