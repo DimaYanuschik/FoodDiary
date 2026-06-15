@@ -45,16 +45,16 @@ fun AuthNavGraph(
         navController = navController,
         startDestination = AuthDestination.Login.route
     ) {
-        composable(AuthDestination.Login.route) {
-            LoginScreen(
-                onNavigateToRegister = {
-                    navController.navigate(AuthDestination.Register.route)
-                },
-                onNavigateToProfileSetup = onNavigateToProfileSetup,
-                onNavigateToHome = onNavigateToHome,
-                viewModel = viewModel
-            )
-        }
+//        composable(AuthDestination.Login.route) {
+//            LoginScreen(
+//                onNavigateToRegister = {
+//                    navController.navigate(AuthDestination.Register.route)
+//                },
+//                onNavigateToProfileSetup = onNavigateToProfileSetup,
+//                onNavigateToHome = onNavigateToHome,
+//                viewModel = viewModel
+//            )
+//        }
 
         composable(AuthDestination.Register.route) {
             RegisterScreen(

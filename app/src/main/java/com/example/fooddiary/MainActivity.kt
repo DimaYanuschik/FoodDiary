@@ -119,14 +119,29 @@ fun MainNavigation() {
                 onNavigateToRegister = {
                     navController.navigate("register")
                 },
-                onNavigateToProfileSetup = {
-                    navController.navigate("profile_setup") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                },
-                onNavigateToHome = {
-                    navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
+//                onNavigateToProfileSetup = {
+//                    navController.navigate("profile_setup") {
+//                        popUpTo("login") { inclusive = true }
+//                    }
+//                },
+//                onNavigateToHome = {
+//                    navController.navigate("home") {
+//                        popUpTo("login") { inclusive = true }
+//                    }
+//                },
+                onAuthSuccess = {
+                    // Проверяем, есть ли профиль
+                    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                    val repository = UserProfileRepository()
+                    val hasProfile = runBlocking { repository.getUserProfile(userId) } != null
+                    if (hasProfile) {
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate("profile_setup") {
+                            popUpTo("login") { inclusive = true }
+                        }
                     }
                 },
                 viewModel = authViewModel

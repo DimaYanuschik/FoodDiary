@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.example.fooddiary.data.model.auth.FirebaseUserDto
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -46,6 +47,12 @@ class FirebaseAuthDataSource @Inject constructor(){
         } catch (e: Exception) {
             throw e
         }
+    }
+
+    suspend fun signInWithGoogle(idToken: String): FirebaseUserDto {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val result = auth.signInWithCredential(credential).await()
+        return FirebaseUserDto.fromFirebaseUser(result.user!!)
     }
 
     suspend fun signOut() {

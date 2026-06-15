@@ -126,6 +126,8 @@
 
 package com.example.fooddiary.presentation.screens.auth
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -138,10 +140,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.fooddiary.R
 import com.example.fooddiary.ui.theme.WireframeTheme
+import com.example.fooddiary.utils.GoogleSignInHelper
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 
 @Composable
 fun RegisterScreen(
@@ -151,6 +159,21 @@ fun RegisterScreen(
 ) {
     val uiState by viewModel.registerUiState.collectAsState()
     val authState by viewModel.authState.collectAsState()
+
+    val context = LocalContext.current
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            account.idToken?.let { idToken ->
+                viewModel.signInWithGoogle(idToken)
+            }
+        } catch (e: ApiException) {
+            // ошибка
+        }
+    }
 
     LaunchedEffect(authState) {
         if (authState != null) {
@@ -292,7 +315,16 @@ fun RegisterScreen(
 
         // Кнопка Google (неактивная)
         OutlinedButton(
-            onClick = { /* не реализовано */ },
+            onClick = {
+                GoogleSignInHelper.signOut(context)
+//                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                    .requestIdToken(context.getString(R.string.default_android_client_id)) // из google-services.json
+//                    .requestEmail()
+//                    .build()
+//                val client = GoogleSignIn.getClient(context, gso)
+                val client = GoogleSignInHelper.getClient(context)
+                googleSignInLauncher.launch(client.signInIntent)
+            },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
 //            enabled = false

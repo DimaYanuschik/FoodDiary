@@ -41,6 +41,15 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun signInWithGoogle(idToken: String): Result<User> {
+        return try {
+            val userDto = dataSource.signInWithGoogle(idToken)
+            Result.success(mapToDomain(userDto))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun signOut(): Result<Unit> {
         return try {
             dataSource.signOut()

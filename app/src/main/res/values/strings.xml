@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FoodDiary</string>
+    <string name="default_android_client_id" translatable="false">156909032448-lon258vrrddovkg8iia0s3on0agmr4ps.apps.googleusercontent.com</string>
 </resources>

@@ -4,6 +4,7 @@ package com.example.fooddiary.di.module
 import com.example.fooddiary.domain.repository.auth.IAuthRepository
 import com.example.fooddiary.data.repository.auth.AuthRepositoryImpl
 import com.example.fooddiary.data.datasource.remote.auth.FirebaseAuthDataSource
+import com.example.fooddiary.domain.usecase.auth.SignInWithGoogleUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,5 +25,10 @@ object AuthModule {
     @Singleton
     fun provideAuthRepository(dataSource: FirebaseAuthDataSource): IAuthRepository {
         return AuthRepositoryImpl(dataSource)
+    }
+
+    @Provides
+    fun provideSignInWithGoogleUseCase(repository: IAuthRepository): SignInWithGoogleUseCase {
+        return SignInWithGoogleUseCase(repository)
     }
 }

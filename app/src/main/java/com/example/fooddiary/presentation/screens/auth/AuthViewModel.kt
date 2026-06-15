@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.fooddiary.domain.model.auth.User
 import com.example.fooddiary.domain.usecase.auth.CheckAuthStatusUseCase
 import com.example.fooddiary.domain.usecase.auth.SignInUseCase
+import com.example.fooddiary.domain.usecase.auth.SignInWithGoogleUseCase
 import com.example.fooddiary.domain.usecase.auth.SignOutUseCase
 import com.example.fooddiary.domain.usecase.auth.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,8 @@ class AuthViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
     private val signUpUseCase: SignUpUseCase,
     private val signOutUseCase: SignOutUseCase,
-    private val checkAuthStatusUseCase: CheckAuthStatusUseCase
+    private val checkAuthStatusUseCase: CheckAuthStatusUseCase,
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase
 ) : ViewModel() {
 
     // Состояние авторизации
@@ -115,6 +117,32 @@ class AuthViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun signInWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _loginUiState.value = _loginUiState.value.copy(isLoading = true, errorMessage = null)
+            val result = signInWithGoogleUseCase(idToken)
+            result.fold(
+                onSuccess = { user ->
+                    _loginUiState.value = _loginUiState.value.copy(isLoading = false)
+                    _authState.value = user
+                },
+                onFailure = { error ->
+                    _loginUiState.value = _loginUiState.value.copy(
+                        isLoading = false,
+                        errorMessage = error.message ?: "Ошибка входа через Google"
+                    )
+                }
+            )
+        }
+    }
+
+    fun onGoogleSignInError(exception: Exception) {
+        _loginUiState.value = _loginUiState.value.copy(
+            isLoading = false,
+            errorMessage = "Ошибка входа через Google: ${exception.message}"
+        )
     }
 
     fun signOut() {

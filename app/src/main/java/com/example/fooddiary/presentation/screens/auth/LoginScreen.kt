@@ -107,9 +107,10 @@
 //}
 
 
-
 package com.example.fooddiary.presentation.screens.auth
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -123,33 +124,60 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 
-
-
-
 import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.fooddiary.ui.theme.WireframeTheme
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.example.fooddiary.R
+import com.example.fooddiary.utils.GoogleSignInHelper
 
 @Composable
 fun LoginScreen(
     onNavigateToRegister: () -> Unit,
-    onNavigateToProfileSetup: () -> Unit,
-    onNavigateToHome: () -> Unit,
+//    onNavigateToProfileSetup: () -> Unit,
+//    onNavigateToHome: () -> Unit,
+    onAuthSuccess: () -> Unit,
     viewModel: AuthViewModel
 ) {
     val uiState by viewModel.loginUiState.collectAsState()
     val authState by viewModel.authState.collectAsState()
 
-    LaunchedEffect(authState) {
-        when {
-            authState != null && authState!!.isEmailVerified -> onNavigateToHome()
-            authState != null && !authState!!.isEmailVerified -> onNavigateToProfileSetup()
+
+    val context = LocalContext.current
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            account.idToken?.let { idToken ->
+                viewModel.signInWithGoogle(idToken)
+            }
+        } catch (e: ApiException) {
+            viewModel.onGoogleSignInError(e)
         }
     }
+
+//    LaunchedEffect(authState) {
+//        when {
+//            authState != null && authState!!.isEmailVerified -> onNavigateToHome()
+//            authState != null && !authState!!.isEmailVerified -> onNavigateToProfileSetup()
+//        }
+//    }
+
+    LaunchedEffect(authState) {
+        if (authState != null) {
+            onAuthSuccess()
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         viewModel.clearForms()
@@ -188,7 +216,11 @@ fun LoginScreen(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                    alpha = 0.5f
+                )
+            )
         ) {
             Column(
                 modifier = Modifier.padding(20.dp),
@@ -264,12 +296,15 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Кнопка Google (неактивная)
+        // Кнопка Google
         OutlinedButton(
-            onClick = { /* не реализовано */ },
+            onClick = {
+                GoogleSignInHelper.signOut(context)
+                val client = GoogleSignInHelper.getClient(context)
+                googleSignInLauncher.launch(client.signInIntent)
+            },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-//            enabled = false   // пока не работает
+            shape = RoundedCornerShape(12.dp)
         ) {
             // Простая иконка Google (текст + восклицательный знак, позже можно заменить на иконку)
             Text("Войти через Google")
