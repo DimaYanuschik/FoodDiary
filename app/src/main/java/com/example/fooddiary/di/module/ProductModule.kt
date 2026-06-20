@@ -2,12 +2,15 @@ package com.example.fooddiary.di.module
 
 import android.content.Context
 import androidx.room.Room
+import com.example.fooddiary.data.datasource.local.dao.FoodEntryDao
 import com.example.fooddiary.data.datasource.remote.product.OpenFoodFactsSearchApi
 import com.example.fooddiary.data.datasource.remote.product.SearchHistoryFirestoreDataSource
 import com.example.fooddiary.data.datasource.local.dao.ProductDao
 import com.example.fooddiary.data.datasource.local.dao.SearchHistoryDao
 import com.example.fooddiary.data.datasource.local.database.AppDatabase
+import com.example.fooddiary.data.repository.FoodRepositoryImpl
 import com.example.fooddiary.data.repository.product.ProductRepositoryImpl
+import com.example.fooddiary.data_old.repository.FoodRepository
 import com.example.fooddiary.domain.repository.product.IProductRepository
 import com.example.fooddiary.domain.repository.auth.IAuthRepository
 import com.example.fooddiary.domain.usecase.product.AddSearchQueryUseCase
@@ -33,6 +36,7 @@ object ProductModule {
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "new_food_diary.db")
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -40,7 +44,19 @@ object ProductModule {
     fun provideProductDao(db: AppDatabase): ProductDao = db.productDao()
 
     @Provides
-    fun provideSearchHistoryDao(db: AppDatabase): SearchHistoryDao = db.SearchHistoryDao()
+    fun provideSearchHistoryDao(db: AppDatabase): SearchHistoryDao = db.searchHistoryDao()
+
+    @Provides
+    fun provideFoodEntryDao(db: AppDatabase): FoodEntryDao = db.foodEntryDao()
+
+    @Provides
+    @Singleton
+    fun provideFoodRepositoryImpl(
+        foodEntryDao: FoodEntryDao,
+        firestoreFoodRepository: FoodRepository
+    ): FoodRepositoryImpl {
+        return FoodRepositoryImpl(foodEntryDao, firestoreFoodRepository)
+    }
 
     // Провайдер OkHttpClient для Retrofit
     @Provides

@@ -249,7 +249,8 @@ fun UserProfileScreen(
                 onExpandedChange = { genderExpanded = it }
             ) {
                 OutlinedTextField(
-                    value = gender.toString(),
+//                    value = gender.toString(),
+                    value = genderDisplayName(gender),
                     onValueChange = {},
                     label = { Text("Пол") },
                     modifier = Modifier
@@ -269,7 +270,8 @@ fun UserProfileScreen(
                 ) {
                     Gender.values().forEach { genderOption ->
                         DropdownMenuItem(
-                            text = { Text(genderOption.toString()) },
+//                            text = { Text(genderOption.toString()) },
+                            text = { Text(genderDisplayName(genderOption),) },
                             onClick = {
                                 gender = genderOption
                                 genderExpanded = false
@@ -481,6 +483,11 @@ fun UserProfileScreen(
             }
         }
     }
+}
+
+private fun genderDisplayName(gender: Gender): String = when (gender) {
+    Gender.MALE -> "Мужской"
+    Gender.FEMALE -> "Женский"
 }
 
 

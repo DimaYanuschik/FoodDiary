@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.currentCompositionErrors
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.fooddiary.data.repository.FoodRepositoryImpl
 import com.example.fooddiary.data_old.models.ScannedFoodEntry
 import com.example.fooddiary.data_old.repository.FoodEntry
 import com.example.fooddiary.data_old.repository.FoodRepository
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FoodViewModel @Inject constructor(
-    private val foodRepository: FoodRepository,
+//    private val foodRepository: FoodRepository,
+    private val foodRepository: FoodRepositoryImpl,
     private val authRepository: IAuthRepository
 ) : ViewModel() {
 
@@ -50,7 +52,12 @@ class FoodViewModel @Inject constructor(
     private val currentUserId: String? = authRepository.getCurrentUser()?.uid
 
     init {
-        loadAllData()
+        viewModelScope.launch {
+            currentUserId?.let { userId ->
+                foodRepository.syncFromFirestore(userId)
+                loadAllData()
+            }
+        }
     }
 
     fun selectDate(date: Date) {
@@ -94,7 +101,7 @@ class FoodViewModel @Inject constructor(
                     _weeklyStats.value = foodRepository.getDailyStatsForWeek(userId, weekStart)
 
                     // все записи для других нужд
-                    _foodEntries.value = foodRepository.getFoodEntries(userId)
+                    //_foodEntries.value = foodRepository.getFoodEntries(userId)
                 } catch (e: Exception) {
                     _errorMessage.value = "Ошибка загрузки: ${e.message}"
                 } finally {
@@ -150,7 +157,7 @@ class FoodViewModel @Inject constructor(
 //        _foodEntries.value = allEntries
 //    }
 
-//    private fun calculateDailyStats(entries: List<FoodEntry>): DailyStats {
+    //    private fun calculateDailyStats(entries: List<FoodEntry>): DailyStats {
     private fun calculateDailyStats(entries: List<FoodEntry>, date: Date): DailyStats {
         val totalCalories = entries.sumOf { it.calories }
         val totalProtein = entries.sumOf { it.protein }
@@ -258,13 +265,13 @@ class FoodViewModel @Inject constructor(
         loadAllData()
     }
 
-    suspend fun TestQueries() {
-        currentUserId?.let { userId ->
-            viewModelScope.launch {
-                foodRepository.testQueries(userId)
-            }
-        }
-    }
+//    suspend fun TestQueries() {
+//        currentUserId?.let { userId ->
+//            viewModelScope.launch {
+//                foodRepository.testQueries(userId)
+//            }
+//        }
+//    }
 
     fun getWeeklyDataForChart(): List<Pair<Date, Int>> {
         return _weeklyStats.value.map { it.date to it.totalCalories }
@@ -272,8 +279,10 @@ class FoodViewModel @Inject constructor(
 
 
     // Продукт, выбранный из поиска для быстрого добавления
-    private val _selectedSearchProduct = MutableStateFlow<com.example.fooddiary.domain.model.product.Product?>(null)
-    val selectedSearchProduct: StateFlow<com.example.fooddiary.domain.model.product.Product?> = _selectedSearchProduct.asStateFlow()
+    private val _selectedSearchProduct =
+        MutableStateFlow<com.example.fooddiary.domain.model.product.Product?>(null)
+    val selectedSearchProduct: StateFlow<com.example.fooddiary.domain.model.product.Product?> =
+        _selectedSearchProduct.asStateFlow()
 
     fun setProductFromSearch(product: com.example.fooddiary.domain.model.product.Product) {
         _selectedSearchProduct.value = product

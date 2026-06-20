@@ -34,23 +34,28 @@ data class DailyStats(
 @Singleton
 class FoodRepository @Inject constructor() {
     private val db: FirebaseFirestore = Firebase.firestore
-//class FoodRepository {
-//    private val db: FirebaseFirestore = Firebase.firestore
 
     companion object {
         const val COLLECTION_FOOD_ENTRIES = "foodEntries"
     }
 
+//    suspend fun addFoodEntry(food: FoodEntry, userId: String): String {
+//        val foodWithId = db.collection(COLLECTION_FOOD_ENTRIES).document()
+//        val foodData = food.copy(
+//            id = foodWithId.id,
+//            userId = userId,
+////            date = Date()
+//        )
+//
+//        foodWithId.set(foodData).await()
+//        return foodWithId.id
+//    }
     suspend fun addFoodEntry(food: FoodEntry, userId: String): String {
-        val foodWithId = db.collection(COLLECTION_FOOD_ENTRIES).document()
-        val foodData = food.copy(
-            id = foodWithId.id,
-            userId = userId,
-//            date = Date()
-        )
-
-        foodWithId.set(foodData).await()
-        return foodWithId.id
+        // Используем food.id как ID документа, а не создаём новый
+        val docRef = db.collection(COLLECTION_FOOD_ENTRIES).document(food.id)
+        val foodData = food.copy(userId = userId)
+        docRef.set(foodData).await()
+        return food.id
     }
 
     suspend fun getFoodEntries(userId: String): List<FoodEntry> {

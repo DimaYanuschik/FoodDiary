@@ -788,12 +788,16 @@ fun FoodListContent(
                 }
             }
         } else {
-            val meals = entries.groupBy { it.mealType }
+//            val meals = entries.groupBy { it.mealType }
+            val mealOrder = listOf("Завтрак", "Обед", "Ужин", "Перекус")
 
 //            // Состояния для каждой категории (по умолчанию все закрыты)
 //            val expandedMealTypes = remember { mutableStateMapOf<String, Boolean>() }
 
-            meals.forEach { (mealType, mealEntries) ->
+            mealOrder.forEach { mealType ->
+                val mealEntries = entries.filter { it.mealType == mealType }
+                if (mealEntries.isEmpty()) return@forEach  // пропускаем пустые категории
+
                 val isExpanded = expandedMealTypes.getOrPut(mealType) { false }
 
                 // Суммарные показатели для этой категории
@@ -870,6 +874,84 @@ fun FoodListContent(
                 }
                 Spacer(Modifier.height(8.dp))
             }
+
+//            meals.forEach { (mealType, mealEntries) ->
+//                val isExpanded = expandedMealTypes.getOrPut(mealType) { false }
+//
+//                // Суммарные показатели для этой категории
+//                val catCalories = mealEntries.sumOf { it.calories }
+//                val catProtein = mealEntries.sumOf { it.protein }
+//                val catFat = mealEntries.sumOf { it.fat }
+//                val catCarbs = mealEntries.sumOf { it.carbs }
+//
+//                // Иконка приёма пищи
+//                val icon = when (mealType) {
+//                    "Завтрак" -> Icons.Filled.FreeBreakfast
+//                    "Обед" -> Icons.Filled.LunchDining
+//                    "Ужин" -> Icons.Filled.DinnerDining
+//                    else -> Icons.Filled.Cookie   // для "Перекус" и всего остального
+//                }
+//
+//                Card(
+//                    onClick = { expandedMealTypes[mealType] = !isExpanded },
+//                    modifier = Modifier.fillMaxWidth(),
+//                    shape = RoundedCornerShape(12.dp),
+//                    colors = CardDefaults.cardColors(
+//                        containerColor = if (isExpanded)
+//                            MaterialTheme.colorScheme.primaryContainer
+//                        else
+//                            MaterialTheme.colorScheme.surface
+//                    ),
+//                    elevation = CardDefaults.cardElevation(
+//                        defaultElevation = if (isExpanded) 4.dp else 2.dp
+//                    )
+//                ) {
+//                    Column {
+//                        Row(
+//                            modifier = Modifier.padding(12.dp),
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Icon(
+//                                imageVector = icon,
+//                                contentDescription = mealType,
+//                                tint = MaterialTheme.colorScheme.primary,
+//                                modifier = Modifier.size(24.dp)
+//                            )
+//                            Spacer(Modifier.width(8.dp))
+//                            Column(Modifier.weight(1f)) {
+//                                Text(
+//                                    text = "$mealType (${mealEntries.size})",
+//                                    style = MaterialTheme.typography.titleSmall,
+//                                    fontWeight = FontWeight.Bold
+//                                )
+//                                Spacer(Modifier.height(2.dp))
+//                                Text(
+//                                    text = "$catCalories ккал  •  Б: ${String.format("%.1f", catProtein)}  Ж: ${String.format("%.1f", catFat)}  У: ${String.format("%.1f", catCarbs)} г",
+//                                    style = MaterialTheme.typography.bodySmall,
+//                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+//                                )
+//                            }
+//                            Icon(
+//                                imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+//                                contentDescription = if (isExpanded) "Свернуть" else "Развернуть"
+//                            )
+//                        }
+//
+//                        AnimatedVisibility(visible = isExpanded) {
+//                            Column(
+//                                modifier = Modifier
+//                                    .padding(bottom = 12.dp),
+//                                verticalArrangement = Arrangement.spacedBy(6.dp)
+//                            ) {
+//                                mealEntries.forEach { food ->
+//                                    FoodItemCard(food = food, onDelete = { onDelete(food.id) })
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                Spacer(Modifier.height(8.dp))
+//            }
         }
     }
 }
