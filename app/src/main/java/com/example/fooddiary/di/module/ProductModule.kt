@@ -3,16 +3,21 @@ package com.example.fooddiary.di.module
 import android.content.Context
 import androidx.room.Room
 import com.example.fooddiary.data.datasource.local.dao.FoodEntryDao
+import com.example.fooddiary.data.datasource.local.dao.FoodNutritionDao
 import com.example.fooddiary.data.datasource.remote.product.OpenFoodFactsSearchApi
 import com.example.fooddiary.data.datasource.remote.product.SearchHistoryFirestoreDataSource
 import com.example.fooddiary.data.datasource.local.dao.ProductDao
 import com.example.fooddiary.data.datasource.local.dao.SearchHistoryDao
 import com.example.fooddiary.data.datasource.local.database.AppDatabase
+import com.example.fooddiary.data.datasource.local.foodrecognition.LocalFoodRecognitionDataSource
 import com.example.fooddiary.data.repository.FoodRepositoryImpl
+import com.example.fooddiary.data.repository.foodrecognition.LocalFoodRecognitionRepositoryImpl
 import com.example.fooddiary.data.repository.product.ProductRepositoryImpl
 import com.example.fooddiary.data_old.repository.FoodRepository
 import com.example.fooddiary.domain.repository.product.IProductRepository
 import com.example.fooddiary.domain.repository.auth.IAuthRepository
+import com.example.fooddiary.domain.repository.foodrecognition.ILocalFoodRecognitionRepository
+import com.example.fooddiary.domain.usecase.foodrecognition.RecognizeFoodLocallyUseCase
 import com.example.fooddiary.domain.usecase.product.AddSearchQueryUseCase
 import com.example.fooddiary.domain.usecase.product.GetSearchHistoryUseCase
 import com.example.fooddiary.domain.usecase.product.SearchProductsUseCase
@@ -101,6 +106,34 @@ object ProductModule {
     ): IProductRepository {
         return ProductRepositoryImpl(api, productDao, searchHistoryDao, firestoreHistory, authRepository)
     }
+
+
+    @Provides
+    fun provideFoodNutritionDao(db: AppDatabase): FoodNutritionDao = db.foodNutritionDao()
+
+    @Provides
+    @Singleton
+    fun provideLocalFoodRecognitionDataSource(@ApplicationContext context: Context): LocalFoodRecognitionDataSource {
+        return LocalFoodRecognitionDataSource(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalFoodRecognitionRepository(
+        dataSource: LocalFoodRecognitionDataSource,
+        nutritionDao: FoodNutritionDao,
+        @ApplicationContext context: Context
+    ): ILocalFoodRecognitionRepository {
+        return LocalFoodRecognitionRepositoryImpl(dataSource, nutritionDao, context)
+    }
+
+    @Provides
+    fun provideRecognizeFoodLocallyUseCase(
+        repository: ILocalFoodRecognitionRepository
+    ): RecognizeFoodLocallyUseCase {
+        return RecognizeFoodLocallyUseCase(repository)
+    }
+
 
     @Provides
     fun provideSearchProductsUseCase(repo: IProductRepository): SearchProductsUseCase {

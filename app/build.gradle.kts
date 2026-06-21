@@ -68,6 +68,10 @@ dependencies {
 //    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
 //    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
+
+    implementation("org.tensorflow:tensorflow-lite:2.14.0")
+    implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
+
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     implementation("com.google.firebase:firebase-auth:23.0.0")
@@ -79,6 +83,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.litert.metadata)
     // CameraX (ИСПРАВЛЕННЫЕ ВЕРСИИ)
 //    val cameraxVersion = "1.3.2"  // Более стабильная версия
     val cameraxVersion = "1.4.1"  // Более стабильная версия
