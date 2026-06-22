@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -304,19 +305,39 @@ fun FoodRecognitionScreen(
                 contentScale = ContentScale.Fit
             )
 
-            // Выбор модели (если ещё не выбрана)
             if (uiState.showModelSelection) {
                 Text("Выберите режим распознавания:", style = MaterialTheme.typography.titleMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(onClick = { recognitionViewModel.onLocalSelected() }) {
-                        Icon(Icons.Filled.PhoneAndroid, contentDescription = null)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = { recognitionViewModel.onLocalSelected() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.PhoneAndroid,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
                         Spacer(Modifier.width(8.dp))
-                        Text("Локально (быстро)")
+                        Text("Локально")
                     }
-                    Button(onClick = { recognitionViewModel.onCloudSelected() }) {
-                        Icon(Icons.Filled.Cloud, contentDescription = null)
+                    Button(
+                        onClick = { recognitionViewModel.onCloudSelected() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.Cloud,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
                         Spacer(Modifier.width(8.dp))
-                        Text("Облако (точно)")
+                        Text("Облако")
                     }
                 }
             }
@@ -352,16 +373,18 @@ fun FoodRecognitionScreen(
                             singleLine = true
                         )
 
-                        // Калории
-                        OutlinedTextField(
-                            value = editable.calories.toInt().toString(),
-                            onValueChange = { cal ->
-                                recognitionViewModel.updateEditableResult(editable.copy(calories = cal.toDoubleOrNull() ?: 0.0))
-                            },
-                            label = { Text("Калории (ккал)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        Text("Состав на 100 г", style = MaterialTheme.typography.titleMedium)
+
+//                        // Калории
+//                        OutlinedTextField(
+//                            value = editable.calories.toInt().toString(),
+//                            onValueChange = { cal ->
+//                                recognitionViewModel.updateEditableResult(editable.copy(calories = cal.toDoubleOrNull() ?: 0.0))
+//                            },
+//                            label = { Text("Калории (ккал)") },
+//                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                            modifier = Modifier.fillMaxWidth()
+//                        )
 
                         // БЖУ
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -388,7 +411,60 @@ fun FoodRecognitionScreen(
                             )
                         }
 
-                        Spacer(Modifier.height(16.dp))
+                        // Валидация БЖУ на 100 г
+                        if (uiState.isBjuInvalid) {
+                            Text(
+                                text = "Сумма белков, жиров и углеводов превышает 100 г",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+                        // Вес порции и количество
+                        Text("Порция", style = MaterialTheme.typography.titleMedium)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedTextField(
+                                value = uiState.portionWeight,
+                                onValueChange = { recognitionViewModel.updatePortionWeight(it.filter { c -> c.isDigit() || c == '.' }) },
+                                label = { Text("Вес порции") },
+                                modifier = Modifier.weight(1f),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                suffix = { Text("г") }
+                            )
+                            OutlinedTextField(
+                                value = uiState.portionCount,
+                                onValueChange = { recognitionViewModel.updatePortionCount(it.filter { c -> c.isDigit() || c == '.' }) },
+                                label = { Text("Кол-во порций") },
+                                modifier = Modifier.weight(1f),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                suffix = { Text("шт") }
+                            )
+                        }
+
+//                        // Итоговые калории (редактируемое)
+//                        OutlinedTextField(
+//                            value = uiState.totalCalories,
+//                            onValueChange = { recognitionViewModel.updateTotalCalories(it.filter { c -> c.isDigit() }) },
+//                            label = { Text("Калории") },
+//                            modifier = Modifier.fillMaxWidth(),
+//                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                            leadingIcon = { Icon(Icons.Filled.LocalFireDepartment, contentDescription = null) },
+//                            suffix = { Text("ккал") }
+//                        )
+                        // Итоговые калории
+                        OutlinedTextField(
+                            value = uiState.totalCalories,
+                            onValueChange = { recognitionViewModel.updateTotalCalories(it.filter { c -> c.isDigit() }) },
+                            label = { Text("Калории") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            leadingIcon = { Icon(Icons.Filled.LocalFireDepartment, contentDescription = null) },
+                            modifier = Modifier.fillMaxWidth(),
+                            suffix = { Text("ккал") }
+                        )
+
                         ExposedDropdownMenuBox(
                             expanded = isMealExpanded,
                             onExpandedChange = { isMealExpanded = it }
@@ -448,23 +524,60 @@ fun FoodRecognitionScreen(
                             }
                         }
 
+                        // Предпросмотр итоговых БЖУ
+                        if (uiState.editableResult != null && uiState.totalProtein > 0 || uiState.totalFat > 0 || uiState.totalCarbs > 0) {
+                            Card(modifier = Modifier.fillMaxWidth()) {
+//                                Column(Modifier.padding(16.dp)) {
+                                Column() {
+                                    Text("Итоговые значения", style = MaterialTheme.typography.titleMedium)
+                                    Spacer(Modifier.height(8.dp))
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Белки:")
+                                        Text("%.1f г".format(uiState.totalProtein))
+                                    }
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Жиры:")
+                                        Text("%.1f г".format(uiState.totalFat))
+                                    }
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Углеводы:")
+                                        Text("%.1f г".format(uiState.totalCarbs))
+                                    }
+                                }
+                            }
+                        }
+
+
+
+
+
                         // Добавление в дневник
                         Button(
                             onClick = {
                                 val result = editable
+//                                val entry = ScannedFoodEntry(
+//                                    name = result.name,
+//                                    calories = result.calories.toInt(),
+//                                    protein = result.protein,
+//                                    fat = result.fat,
+//                                    carbs = result.carbs,
+//                                    date = selectedDate,
+//                                    mealType = mealType
+//                                )
                                 val entry = ScannedFoodEntry(
                                     name = result.name,
-                                    calories = result.calories.toInt(),
-                                    protein = result.protein,
-                                    fat = result.fat,
-                                    carbs = result.carbs,
+                                    calories = uiState.totalCalories.toIntOrNull() ?: 0,
+                                    protein = uiState.totalProtein,
+                                    fat = uiState.totalFat,
+                                    carbs = uiState.totalCarbs,
                                     date = selectedDate,
                                     mealType = mealType
                                 )
                                 foodViewModel.addFoodEntry(entry)
                                 onFoodAdded()
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = editable.name.isNotBlank() && !uiState.isLoading && !uiState.isBjuInvalid
                         ) {
                             Text("Добавить в дневник")
                         }

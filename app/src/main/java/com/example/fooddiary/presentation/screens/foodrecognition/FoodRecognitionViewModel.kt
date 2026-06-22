@@ -21,7 +21,15 @@ data class FoodRecognitionUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val isLocalMode: Boolean = false,      // новый флаг
-    val showModelSelection: Boolean = true // показывать выбор модели
+    val showModelSelection: Boolean = true, // показывать выбор модели
+    // поля для порции и итоговых значений
+    val portionWeight: String = "100",
+    val portionCount: String = "1",
+    val totalCalories: String = "",
+    val totalProtein: Double = 0.0,
+    val totalFat: Double = 0.0,
+    val totalCarbs: Double = 0.0,
+    val isBjuInvalid: Boolean = false
 )
 
 //@HiltViewModel
@@ -133,9 +141,56 @@ class FoodRecognitionViewModel @Inject constructor(
         recognizeLocally(bitmap)
     }
 
-    // Ручное редактирование полей
+//    // Ручное редактирование полей
+//    fun updateEditableResult(result: FoodRecognitionResult) {
+//        _uiState.value = _uiState.value.copy(editableResult = result)
+//    }
+
     fun updateEditableResult(result: FoodRecognitionResult) {
-        _uiState.value = _uiState.value.copy(editableResult = result)
+        // При ручном редактировании БЖУ пересчитываем калории
+        val newCalories = (result.protein * 4 + result.fat * 9 + result.carbs * 4).toInt()
+        val newResult = result.copy(calories = newCalories.toDouble())
+        _uiState.value = _uiState.value.copy(editableResult = newResult)
+        recalculateTotals()
+    }
+
+    fun updatePortionWeight(weight: String) {
+        _uiState.value = _uiState.value.copy(portionWeight = weight)
+        recalculateTotals()
+    }
+
+
+    fun updatePortionCount(count: String) {
+        _uiState.value = _uiState.value.copy(portionCount = count)
+        recalculateTotals()
+    }
+
+    fun updateTotalCalories(calories: String) {
+        _uiState.value = _uiState.value.copy(totalCalories = calories)
+    }
+
+    // Пересчёт итоговых значений с учётом порции
+    private fun recalculateTotals() {
+        val result = _uiState.value.editableResult ?: return
+        val weight = _uiState.value.portionWeight.toDoubleOrNull() ?: 100.0
+        val count = _uiState.value.portionCount.toDoubleOrNull() ?: 1.0
+        val factor = (weight / 100.0) * count
+
+        val totalProtein = result.protein * factor
+        val totalFat = result.fat * factor
+        val totalCarbs = result.carbs * factor
+        val totalCalories = (totalProtein * 4 + totalFat * 9 + totalCarbs * 4).toInt().toString()
+
+        // Проверка валидности: сумма БЖУ на 100 г не должна превышать 100 г
+        val isBjuInvalid = (result.protein + result.fat + result.carbs) > 100.0
+
+        _uiState.value = _uiState.value.copy(
+            totalProtein = totalProtein,
+            totalFat = totalFat,
+            totalCarbs = totalCarbs,
+            totalCalories = totalCalories,
+            isBjuInvalid = isBjuInvalid
+        )
     }
 
     // Уточняющий запрос (только для облачного режима)
@@ -170,6 +225,7 @@ class FoodRecognitionViewModel @Inject constructor(
                         editableResult = result,
                         isLoading = false
                     )
+                    recalculateTotals()
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(
@@ -200,6 +256,7 @@ class FoodRecognitionViewModel @Inject constructor(
                         editableResult = domainResult,
                         isLoading = false
                     )
+                    recalculateTotals()
                 }
                 .onFailure { error ->
                     _uiState.value = _uiState.value.copy(

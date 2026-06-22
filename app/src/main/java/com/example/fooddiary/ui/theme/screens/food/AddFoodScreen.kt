@@ -80,6 +80,11 @@ fun AddFoodScreen(
         totalCarbs = carb * factor
         totalCalories = ((totalProtein * 4) + (totalFat * 9) + (totalCarbs * 4)).toInt().toString()
     }
+
+    // Валидация БЖУ на 100 г – не должна превышать 100 г
+    val isBjuInvalid = (proteinPer100.toDoubleOrNull() ?: 0.0) +
+            (fatPer100.toDoubleOrNull() ?: 0.0) +
+            (carbsPer100.toDoubleOrNull() ?: 0.0) > 100.0
 //
 //    // Функция пересчёта абсолютных КБЖУ и калорий
 //    fun recalculate() {
@@ -248,6 +253,18 @@ fun AddFoodScreen(
                 )
             }
 
+            // Сообщение о превышении суммы БЖУ на 100 г
+            if (isBjuInvalid) {
+                Text(
+                    text = "Сумма БЖУ превышает 100 г",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+//                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
+            Text("Порция", style = MaterialTheme.typography.titleMedium)
+
             // Вес порции и количество
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -347,7 +364,7 @@ fun AddFoodScreen(
                     onFoodAdded()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = foodName.isNotBlank() && !isLoading
+                enabled = foodName.isNotBlank() && !isLoading && !isBjuInvalid
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(

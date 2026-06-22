@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -59,15 +60,6 @@ fun BarcodeProductScreen(
         hiltViewModel()
     }
 
-//    // Загружаем продукт при старте
-//    LaunchedEffect(barcode) {
-//        barcodeViewModel.scanBarcodeFromBitmap(null) // сбросим состояние
-//        // BarcodeViewModel умеет загружать продукт по штрихкоду?
-//        // У нас есть fetchProductInfo, но он требует barcode и возвращает результат сразу.
-//        // В ViewModel нет готового метода для загрузки по штрихкоду без bitmap.
-//        // Придётся вызвать barcodeRepository.fetchProductInfo напрямую?
-//        // Лучше добавить в BarcodeViewModel метод loadProductByBarcode(barcode)
-//    }
 
     LaunchedEffect(barcode) {
         barcodeViewModel.fetchProductByBarcode(barcode)
@@ -76,17 +68,50 @@ fun BarcodeProductScreen(
     val uiState by barcodeViewModel.uiState.collectAsState()
     val product = (uiState.scanState as? BarcodeScanState.ProductFound)?.result?.product
 
-//    val product = scanResult.product
+    // Состояния для редактирования состава на 100 г
+    var proteinPer100 by remember { mutableStateOf("") }
+    var fatPer100 by remember { mutableStateOf("") }
+    var carbsPer100 by remember { mutableStateOf("") }
+    var portionWeight by remember { mutableStateOf("100") }
+    var portionCount by remember { mutableStateOf("1") }
 
-//    if (product == null) {
-//        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//            Text("Информация о продукте отсутствует")
-//            Button(onClick = onNavigateBack, modifier = Modifier.padding(top = 16.dp)) {
-//                Text("Назад")
-//            }
-//        }
-//        return
-//    }
+    // Итоговые значения
+    var totalCalories by remember { mutableStateOf("") }
+    var totalProtein by remember { mutableStateOf(0.0) }
+    var totalFat by remember { mutableStateOf(0.0) }
+    var totalCarbs by remember { mutableStateOf(0.0) }
+
+    // Функция пересчёта
+    fun updateTotals() {
+        val p = proteinPer100.toDoubleOrNull() ?: 0.0
+        val f = fatPer100.toDoubleOrNull() ?: 0.0
+        val c = carbsPer100.toDoubleOrNull() ?: 0.0
+        val w = portionWeight.toDoubleOrNull() ?: 100.0
+        val cnt = portionCount.toDoubleOrNull() ?: 1.0
+        val factor = (w / 100.0) * cnt
+
+        totalProtein = p * factor
+        totalFat = f * factor
+        totalCarbs = c * factor
+        totalCalories = ((totalProtein * 4) + (totalFat * 9) + (totalCarbs * 4)).toInt().toString()
+    }
+
+    // Заполнение полей при получении продукта
+    LaunchedEffect(product) {
+        product?.let {
+            proteinPer100 = it.protein.toString()
+            fatPer100 = it.fat.toString()
+            carbsPer100 = it.carbs.toString()
+            portionWeight = "100"
+            portionCount = "1"
+            updateTotals()
+        }
+    }
+
+    // Валидация БЖУ на 100 г
+    val isBjuInvalid = (proteinPer100.toDoubleOrNull() ?: 0.0) +
+            (fatPer100.toDoubleOrNull() ?: 0.0) +
+            (carbsPer100.toDoubleOrNull() ?: 0.0) > 100.0
 
     // State для ввода данных
     var servingSize by remember { mutableStateOf("100") }
@@ -181,41 +206,119 @@ fun BarcodeProductScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // БЖУ Ряд
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        NutritionItem("Ккал", ((product.calories * factor).toInt()).toString())
-                        NutritionItem("Белки", String.format("%.1f", product.protein * factor))
-                        NutritionItem("Жиры", String.format("%.1f", product.fat * factor))
-                        NutritionItem("Углев.", String.format("%.1f", product.carbs * factor))
-                    }
+//                    // БЖУ Ряд
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        NutritionItem("Ккал", ((product.calories * factor).toInt()).toString())
+//                        NutritionItem("Белки", String.format("%.1f", product.protein * factor))
+//                        NutritionItem("Жиры", String.format("%.1f", product.fat * factor))
+//                        NutritionItem("Углев.", String.format("%.1f", product.carbs * factor))
+//                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Поля ввода
-            OutlinedTextField(
-                value = quantity,
-                onValueChange = { if (it.all { char -> char.isDigit() || char == '.' }) quantity = it },
-                label = { Text("Количество порций") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Редактируемые поля: состав на 100 г
+            Text("Состав на 100 г", style = MaterialTheme.typography.titleMedium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = proteinPer100,
+                    onValueChange = {
+                        proteinPer100 = it.filter { c -> c.isDigit() || c == '.' }
+                        updateTotals()
+                    },
+                    label = { Text("Белки") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    suffix = { Text("г") }
+                )
+                OutlinedTextField(
+                    value = fatPer100,
+                    onValueChange = {
+                        fatPer100 = it.filter { c -> c.isDigit() || c == '.' }
+                        updateTotals()
+                    },
+                    label = { Text("Жиры") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    suffix = { Text("г") }
+                )
+                OutlinedTextField(
+                    value = carbsPer100,
+                    onValueChange = {
+                        carbsPer100 = it.filter { c -> c.isDigit() || c == '.' }
+                        updateTotals()
+                    },
+                    label = { Text("Углеводы") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    suffix = { Text("г") }
+                )
+            }
+
+            // Валидация БЖУ
+            if (isBjuInvalid) {
+                Text(
+                    text = "Сумма БЖУ превышает 100 г",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Порция
+            Text("Порция", style = MaterialTheme.typography.titleMedium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = portionWeight,
+                    onValueChange = {
+                        portionWeight = it.filter { c -> c.isDigit() || c == '.' }
+                        updateTotals()
+                    },
+                    label = { Text("Вес порции") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    suffix = { Text("г") }
+                )
+                OutlinedTextField(
+                    value = portionCount,
+                    onValueChange = {
+                        portionCount = it.filter { c -> c.isDigit() || c == '.' }
+                        updateTotals()
+                    },
+                    label = { Text("Кол-во порций") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    suffix = { Text("шт") }
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Итоговые калории
             OutlinedTextField(
-                value = servingSize,
-                onValueChange = { if (it.all { char -> char.isDigit() || char == '.' }) servingSize = it },
-                label = { Text("Размер порции (г/мл)") },
+                value = totalCalories,
+                onValueChange = { totalCalories = it.filter { c -> c.isDigit() } },
+                label = { Text("Калории") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                leadingIcon = { Icon(Icons.Filled.LocalFireDepartment, contentDescription = null) },
+                modifier = Modifier.fillMaxWidth(),
+                suffix = { Text("ккал") }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+
             ExposedDropdownMenuBox(
                 expanded = isMealExpanded,
                 onExpandedChange = { isMealExpanded = it }
@@ -246,19 +349,77 @@ fun BarcodeProductScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Предпросмотр БЖУ
+            if (totalProtein > 0 || totalFat > 0 || totalCarbs > 0) {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text("Итоговые значения", style = MaterialTheme.typography.titleMedium)
+                        Spacer(Modifier.height(8.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Белки:")
+                            Text("%.1f г".format(totalProtein))
+                        }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Жиры:")
+                            Text("%.1f г".format(totalFat))
+                        }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Углеводы:")
+                            Text("%.1f г".format(totalCarbs))
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Поля ввода
+//            OutlinedTextField(
+//                value = quantity,
+//                onValueChange = { if (it.all { char -> char.isDigit() || char == '.' }) quantity = it },
+//                label = { Text("Количество порций") },
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+//                modifier = Modifier.fillMaxWidth()
+//            )
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            OutlinedTextField(
+//                value = servingSize,
+//                onValueChange = { if (it.all { char -> char.isDigit() || char == '.' }) servingSize = it },
+//                label = { Text("Размер порции (г/мл)") },
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                modifier = Modifier.fillMaxWidth()
+//            )
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
                     // Запись для дневника
+//                    val entry = ScannedFoodEntry(
+//                        id = UUID.randomUUID().toString(),
+//                        name = product.name,
+//                        calories = (product.calories * factor).toInt(),
+//                        protein = product.protein * factor,
+//                        fat = product.fat * factor,
+//                        carbs = product.carbs * factor,
+////                        date = Date(),
+//                        date = foodViewModel.selectedDate.value,
+//                        barcode = product.barcode,
+//                        originalProduct = product,
+//                        source = "scanner",
+//                        mealType = mealType
+//                    )
                     val entry = ScannedFoodEntry(
                         id = UUID.randomUUID().toString(),
                         name = product.name,
-                        calories = (product.calories * factor).toInt(),
-                        protein = product.protein * factor,
-                        fat = product.fat * factor,
-                        carbs = product.carbs * factor,
-//                        date = Date(),
+                        calories = totalCalories.toIntOrNull() ?: 0,
+                        protein = totalProtein,
+                        fat = totalFat,
+                        carbs = totalCarbs,
                         date = foodViewModel.selectedDate.value,
                         barcode = product.barcode,
                         originalProduct = product,
@@ -272,7 +433,8 @@ fun BarcodeProductScreen(
 
                     onAddToDiary()
                 },
-                modifier = Modifier.fillMaxWidth().height(50.dp)
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                enabled = product.name.isNotBlank() && !isBjuInvalid
             ) {
                 Text("Добавить в дневник")
             }
